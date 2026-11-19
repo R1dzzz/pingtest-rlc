@@ -1,0 +1,23 @@
+{
+  "name": "pingtest-by-rlc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "PingTest by RLC — tes kecepatan & kualitas internet (download, upload, latency, jitter, bufferbloat) memakai @cloudflare/speedtest. Frontend-only, static site.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "dependencies": {
+    "@cloudflare/speedtest": "1.17.0",
+    "@fontsource-variable/instrument-sans": "5.3.0",
+    "@fontsource-variable/jetbrains-mono": "5.3.0"
+  },
+  "devDependencies": {
+    "vite": "8.3.8"
+  }
+}
