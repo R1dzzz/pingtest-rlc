@@ -1,8 +1,5 @@
 import { defineConfig } from 'vite';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { resolve } from 'path';
 
 export default defineConfig({
   build: {
@@ -13,8 +10,5 @@ export default defineConfig({
         about: resolve(__dirname, 'about.html'),
       },
     },
-  },
-  server: {
-    host: true,
   },
 });
