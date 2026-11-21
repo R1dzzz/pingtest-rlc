@@ -106,18 +106,13 @@ export function snapshotOf(results, t0) {
   };
 }
 
+// Mengembalikan kunci i18n (diterjemahkan di UI sesuai bahasa aktif).
 function describeError(msg, status) {
-  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-    return 'Perangkat sedang offline. Periksa Wi-Fi atau data seluler lalu coba lagi.';
-  }
-  if (isNum(status) && status > 0) {
-    return `Server pengukuran membalas HTTP ${status}. Mungkin dibatasi sementara atau diblokir jaringan Anda.`;
-  }
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return { key: 'err.offline' };
+  if (isNum(status) && status > 0) return { key: 'err.http', params: { status } };
   const m = String(msg || '').toLowerCase();
-  if (m.includes('timing') || m.includes('timeout')) {
-    return 'Permintaan terlalu lama atau data waktu dari browser tidak tersedia. Coba lagi dengan koneksi yang lebih stabil.';
-  }
-  return 'Tidak dapat menjangkau server pengukuran Cloudflare. Kemungkinan koneksi terputus atau diblokir (VPN, firewall sekolah, pemblokir iklan/DNS). Browser tidak memberi tahu penyebab pastinya.';
+  if (m.includes('timing') || m.includes('timeout')) return { key: 'err.timing' };
+  return { key: 'err.generic' };
 }
 
 /**
@@ -136,21 +131,21 @@ export class Session {
     this.activity = 'connect';
     this.planned = plannedCounts(this.profile.measurements);
     this.t0 = 0;
-    this._offline = () => this.fail('Koneksi terputus saat tes berjalan. Hasil tes dibatalkan agar tidak menyesatkan.');
+    this._offline = () => this.fail({ key: 'err.lost' });
   }
 
   async start() {
     this.t0 = Date.now();
     this.cb.onStart && this.cb.onStart();
     if (navigator.onLine === false) {
-      this.fail('Perangkat sedang offline. Sambungkan ke internet lalu coba lagi.');
+      this.fail({ key: 'err.offline' });
       return;
     }
     let Engine;
     try {
       Engine = await loadEngine();
     } catch {
-      this.fail('Gagal memuat mesin pengukur. Periksa koneksi lalu muat ulang halaman.');
+      this.fail({ key: 'err.load' });
       return;
     }
     if (this.ended) return;
@@ -166,7 +161,7 @@ export class Session {
     try {
       this.engine = new Engine(cfg);
     } catch {
-      this.fail('Mesin pengukur gagal diinisialisasi di browser ini.');
+      this.fail({ key: 'err.init' });
       return;
     }
     const e = this.engine;
@@ -183,7 +178,7 @@ export class Session {
     try {
       e.play();
     } catch {
-      this.fail('Tes tidak dapat dimulai di browser ini.');
+      this.fail({ key: 'err.start' });
     }
   }
 
@@ -228,8 +223,8 @@ export class Session {
     const raw = results.raw || {};
     const partial = !isNum(snap.download) || !isNum(snap.upload) || !isNum(snap.latency);
     let note = '';
-    if (raw.error) note = 'Tes dihentikan lebih awal karena batas waktu; hasil berasal dari data yang sempat terkumpul.';
-    else if (partial) note = 'Sebagian metrik tidak tersedia karena pengukurannya gagal atau terlalu singkat.';
+    if (raw.error) note = 'note.timeout';
+    else if (partial) note = 'note.partial';
     this.cb.onDone && this.cb.onDone({
       snap, partial: partial || !!raw.error, note,
       durationMs: num(() => results.getTotalDurationMs()) ?? Date.now() - this.t0,

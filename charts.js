@@ -1,5 +1,6 @@
 // Grafik garis SVG ringan (tanpa library). Sentuh/arahkan untuk melihat nilai titik terdekat.
 import { escapeHtml, isNum } from './util.js';
+import { t } from './i18n.js';
 
 function niceStep(range, n) {
   const raw = range / n;
@@ -60,9 +61,9 @@ export function lineChart(host, readout, opts) {
     }
   }
   g += '<line class="cross" id="cx" x1="0" x2="0" y1="' + pad.t + '" y2="' + (H - pad.b) + '" style="display:none"/>';
-  g += '<circle id="cdot" r="5" fill="none" stroke="#fff" stroke-width="2" style="display:none"/>';
+  g += '<circle id="cdot" r="5" fill="none" stroke="currentColor" stroke-width="2" style="display:none"/>';
 
-  host.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${escapeHtml(opts.title || 'Grafik')}">${g}</svg>`;
+  host.innerHTML = `<svg class="chart-svg" style="color:var(--text)" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${escapeHtml(opts.title || 'Grafik')}">${g}</svg>`;
   const svg = host.firstChild;
   const cx = svg.querySelector('#cx');
   const dot = svg.querySelector('#cdot');
@@ -72,7 +73,7 @@ export function lineChart(host, readout, opts) {
   lg.className = 'legend';
   lg.innerHTML = legend;
   host.append(lg);
-  readout.textContent = 'Sentuh grafik untuk melihat nilai.';
+  readout.textContent = t('chart.touch');
 
   function near(ev) {
     const r = svg.getBoundingClientRect();

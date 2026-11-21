@@ -1,5 +1,6 @@
 // Speedometer SVG. Skala logaritmik 0–1000 Mbps agar kecepatan rendah dan tinggi sama-sama terbaca.
 import { speedText } from './util.js';
+import { motionOn } from './settings.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const CX = 160, CY = 150, R = 118, A0 = -120, A1 = 120, MAXV = 1000;
@@ -74,7 +75,8 @@ export function createGauge(host) {
     needle.style.transform = `rotate(${fracToDeg(f)}deg)`;
   }
 
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const reduce = () => !motionOn() || (reduceMq && reduceMq.matches);
 
   return {
     // Menampilkan nilai hasil ukur. Jarum hanya bergerak ke nilai yang benar-benar terukur.
@@ -87,7 +89,7 @@ export function createGauge(host) {
       }
       const target = Number.isFinite(v) ? v : 0;
       const from = shown;
-      if (reduce || from === target) { shown = target; paint(target, valueToFrac(target)); return; }
+      if (reduce() || from === target) { shown = target; paint(target, valueToFrac(target)); return; }
       const t0 = performance.now();
       const dur = 650;
       const step = (now) => {

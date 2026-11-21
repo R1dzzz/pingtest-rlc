@@ -20,6 +20,7 @@ const STATIC_FILES = [
   'favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png',
   'icon-maskable-512.png', 'og-image.png', 'manifest.webmanifest', 'logo.svg',
   'brand-claude.svg', 'brand-chatgpt.svg', 'brand-grok.svg', 'brand-kimi.svg',
+  'logo-smk-tamtama.webp', 'logo-lpks-x-japan.webp', 'offline.html',
 ];
 
 function rlcSite() {
@@ -39,6 +40,11 @@ function rlcSite() {
       for (const f of STATIC_FILES) {
         this.emitFile({ type: 'asset', fileName: f, source: readFileSync(resolve(root, f)) });
       }
+      // Service Worker: sisipkan ID build agar cache lama dibuang setiap ada deploy baru.
+      this.emitFile({
+        type: 'asset', fileName: 'sw.js',
+        source: readFileSync(resolve(root, 'sw.js'), 'utf8').replace('__BUILD_ID__', Date.now().toString(36)),
+      });
       this.emitFile({
         type: 'asset', fileName: 'robots.txt',
         source: `User-agent: *\nAllow: /\n\nSitemap: ${site}/sitemap.xml\n`,

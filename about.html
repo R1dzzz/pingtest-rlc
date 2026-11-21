@@ -1,15 +1,34 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-theme="dark" data-glass="off" data-motion="on">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Tentang PingTest by RLC — Farid Alfiyansah, SMK Tamtama Karanganyar</title>
-  <meta name="description" content="Tentang PingTest by RLC: ide dari Farid Alfiyansah (XI TJKT 2, SMK Tamtama Karanganyar), dikembangkan oleh Rogue Logic Creations (RLC) dengan bantuan AI tools.">
+  <meta name="description" content="Tentang PingTest by Farid Alfiyansah (XI TJKT 2, SMK Tamtama Karanganyar): profil, Excellent Japan Class Program bersama LPKS X Japan, dan AI tools. Dikembangkan oleh Rogue Logic Creations (RLC).">
   <link rel="canonical" href="__SITE_URL__/about">
   <meta name="robots" content="index,follow,max-image-preview:large">
   <meta name="author" content="Rogue Logic Creations (RLC)">
   <meta name="theme-color" content="#09090a">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="dark light">
+
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('pingtest-rlc:settings:v1') || 'null');
+        var has = false;
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && k.indexOf('sb-') === 0 && k.slice(-11) === '-auth-token') { has = true; break; }
+        }
+        if (s && s.settings && has) {
+          var d = document.documentElement;
+          d.dataset.theme = s.settings.theme === 'light' ? 'light' : 'dark';
+          d.dataset.glass = s.settings.glass ? 'on' : 'off';
+          d.dataset.motion = s.settings.motion === false ? 'off' : 'on';
+        }
+      } catch (e) {}
+    })();
+  </script>
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -20,7 +39,7 @@
   <meta property="og:site_name" content="PingTest by RLC">
   <meta property="og:locale" content="id_ID">
   <meta property="og:title" content="Tentang PingTest by RLC — Farid Alfiyansah, SMK Tamtama Karanganyar">
-  <meta property="og:description" content="Ide oleh Farid Alfiyansah (TJKT, SMK Tamtama Karanganyar). Dikembangkan oleh Rogue Logic Creations (RLC).">
+  <meta property="og:description" content="Profil Farid Alfiyansah (TJKT, SMK Tamtama Karanganyar), Excellent Japan Class Program, dan AI tools di balik PingTest by RLC.">
   <meta property="og:url" content="__SITE_URL__/about">
   <meta property="og:image" content="__SITE_URL__/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -40,7 +59,7 @@
         "@id": "__SITE_URL__/about#page",
         "url": "__SITE_URL__/about",
         "name": "Tentang PingTest by RLC",
-        "inLanguage": "id",
+        "inLanguage": ["id", "en"],
         "isPartOf": { "@id": "__SITE_URL__/#website" },
         "mainEntity": { "@id": "__SITE_URL__/about#farid" },
         "breadcrumb": { "@id": "__SITE_URL__/about#breadcrumb" }
@@ -52,7 +71,10 @@
         "description": "Farid Alfiyansah is the idea originator behind PingTest by RLC. He is a student at SMK Tamtama Karanganyar, majoring in Computer and Network Engineering (TJKT), with an interest in technology, networking, and software development.",
         "url": "https://github.com/r1dzzz",
         "sameAs": ["https://github.com/r1dzzz"],
-        "affiliation": { "@type": "EducationalOrganization", "name": "SMK Tamtama Karanganyar" }
+        "affiliation": [
+          { "@type": "EducationalOrganization", "name": "SMK Tamtama Karanganyar", "url": "https://smktamtamaka.sch.id/" },
+          { "@type": "Organization", "name": "LPKS X Japan", "url": "https://lpksxjapan.com/" }
+        ]
       },
       {
         "@type": "BreadcrumbList",
@@ -68,46 +90,93 @@
 
   <script type="module" src="/about.js"></script>
 </head>
-<body class="about">
-  <a class="skip" href="#main">Lewati ke konten</a>
+<body class="about" data-page="about">
+  <a class="skip" href="#main" data-i18n="skip">Lewati ke konten</a>
 
   <header class="top">
     <div class="wrap bar">
-      <a class="brand" href="/" aria-label="PingTest by RLC — beranda">
+      <a class="brand" href="/" aria-label="PingTest by RLC" data-i18n-attr="aria-label:brand.home">
         <img src="/logo.svg" alt="" width="22" height="26">
         <span class="brand-name">PingTest</span><span class="brand-by">by RLC</span>
       </a>
-      <nav class="nav" aria-label="Navigasi utama">
-        <a href="/#tes">Tes</a>
-        <a href="/#diagnostik">Diagnostik</a>
-        <a href="/#riwayat">Riwayat</a>
-        <a href="/about" aria-current="page">Tentang</a>
+      <div class="actions" id="actions"></div>
+    </div>
+    <div class="wrap">
+      <nav class="nav" aria-label="Navigasi utama" data-i18n-attr="aria-label:nav.label">
+        <a href="/#tes" data-i18n="nav.test">Tes</a>
+        <a href="/#diagnostik" data-i18n="nav.diag">Diagnostik</a>
+        <a href="/#riwayat" data-i18n="nav.history">Riwayat</a>
+        <a href="/about" aria-current="page" data-i18n="nav.about">Tentang</a>
       </nav>
     </div>
   </header>
 
   <main id="main">
     <section class="wrap stage-head about-head" aria-labelledby="h1">
-      <p class="eyebrow">Tentang proyek</p>
-      <h1 id="h1">Tentang PingTest by RLC<span>Dibuat di SMK Tamtama Karanganyar</span></h1>
-      <p class="lede">PingTest by RLC adalah website pengujian kecepatan dan kualitas internet. Proyek ini dikembangkan oleh Rogue Logic Creations (RLC) dari ide Farid Alfiyansah, siswa Teknik Jaringan dan Telekomunikasi (TJKT) kelas XI TJKT 2 di SMK Tamtama Karanganyar.</p>
+      <p class="eyebrow" data-i18n="about.eyebrow">Tentang proyek</p>
+      <h1 id="h1"><span class="h1-main" data-i18n="about.h1">Tentang PingTest by RLC</span><span data-i18n="about.h1sub">Dibuat di SMK Tamtama Karanganyar</span></h1>
+      <p class="lede" data-i18n="about.lede">PingTest by RLC adalah website pengujian kecepatan dan kualitas internet. Proyek ini dikembangkan oleh Rogue Logic Creations (RLC) dari ide Farid Alfiyansah, siswa Teknik Jaringan Komputer dan Telekomunikasi (TJKT) kelas XI TJKT 2 di SMK Tamtama Karanganyar.</p>
     </section>
 
     <section class="wrap section" aria-labelledby="h-by">
-      <p class="eyebrow">Disusun oleh</p>
-      <h2 id="h-by" class="sr-only">Disusun oleh</h2>
+      <p class="eyebrow" data-i18n="about.by">Disusun oleh</p>
+      <h2 id="h-by" class="sr-only" data-i18n="about.by">Disusun oleh</h2>
       <article class="panel profile">
         <div class="avatar" id="avatar" aria-hidden="true">
           <img src="/logo.svg" alt="" width="40" height="48">
         </div>
         <div class="profile-body">
           <h3>Farid Alfiyansah</h3>
-          <p class="role">Idea originator · TJKT · SMK Tamtama Karanganyar</p>
+          <p class="role" data-i18n="about.role">Idea originator · TJKT · SMK Tamtama Karanganyar</p>
           <p lang="en">Farid Alfiyansah is the idea originator behind PingTest by RLC. He is a student at SMK Tamtama Karanganyar, majoring in Computer and Network Engineering (TJKT), with an interest in technology, networking, and software development.</p>
-          <a class="gh" href="https://github.com/r1dzzz" target="_blank" rel="noopener noreferrer" aria-label="Profil GitHub Farid Alfiyansah, @r1dzzz">
+          <p class="tr only-id" data-i18n="about.bio.id">Terjemahan: Farid Alfiyansah adalah penggagas ide di balik PingTest by RLC. Ia siswa SMK Tamtama Karanganyar jurusan Teknik Jaringan Komputer dan Telekomunikasi (TJKT) dengan minat pada teknologi, jaringan, dan pengembangan perangkat lunak.</p>
+
+          <dl class="facts">
+            <div><dt data-i18n="about.dob">Tanggal lahir</dt><dd><time datetime="2007-10-04" id="dob">04 Oktober 2007</time></dd></div>
+            <div><dt data-i18n="about.age.l">Usia</dt><dd id="age" data-dob="2007-10-04">—</dd></div>
+            <div><dt data-i18n="about.school">Sekolah</dt><dd><a href="https://smktamtamaka.sch.id/" target="_blank" rel="noopener noreferrer">SMK Tamtama Karanganyar</a></dd></div>
+            <div><dt data-i18n="about.dept">Jurusan</dt><dd>Computer and Network Engineering (TJKT)</dd></div>
+          </dl>
+
+          <a class="gh" href="https://github.com/r1dzzz" target="_blank" rel="noopener noreferrer" aria-label="Profil GitHub Farid Alfiyansah, @r1dzzz" data-i18n-attr="aria-label:about.gh.aria">
             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
             <span>@r1dzzz</span>
           </a>
+        </div>
+      </article>
+
+      <article class="panel school" aria-labelledby="h-school">
+        <a class="logo-plate" href="https://smktamtamaka.sch.id/" target="_blank" rel="noopener noreferrer" aria-label="SMK Tamtama Karanganyar (smktamtamaka.sch.id)">
+          <img src="/logo-smk-tamtama.webp" alt="Logo SMK Tamtama Karanganyar" width="900" height="227" loading="lazy">
+        </a>
+        <div>
+          <h3 id="h-school">SMK Tamtama Karanganyar</h3>
+          <p class="fine" data-i18n="about.school.p">Sekolah tempat Farid menempuh pendidikan di jurusan Teknik Jaringan Komputer dan Telekomunikasi (TJKT).</p>
+          <a class="btn ghost sm" href="https://smktamtamaka.sch.id/" target="_blank" rel="noopener noreferrer" data-i18n="about.school.visit">Kunjungi website sekolah</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="wrap section" aria-labelledby="h-jp">
+      <p class="eyebrow">Excellent Japan Class Program</p>
+      <h2 id="h-jp" class="collab">SMK TAMTAMA KARANGANYAR × LPKS X JAPAN</h2>
+      <article class="panel jp">
+        <div class="jp-logos">
+          <a class="logo-plate" href="https://smktamtamaka.sch.id/" target="_blank" rel="noopener noreferrer" aria-label="SMK Tamtama Karanganyar">
+            <img src="/logo-smk-tamtama.webp" alt="Logo SMK Tamtama Karanganyar" width="900" height="227" loading="lazy">
+          </a>
+          <span class="times" aria-hidden="true">×</span>
+          <a class="logo-plate" href="https://lpksxjapan.com/" target="_blank" rel="noopener noreferrer" aria-label="LPKS X Japan (lpksxjapan.com)">
+            <img src="/logo-lpks-x-japan.webp" alt="Logo LPKS X Japan" width="900" height="331" loading="lazy">
+          </a>
+        </div>
+        <div class="jp-text">
+          <p lang="en">Farid Alfiyansah takes part in the Excellent Japan Class Program, a collaboration between SMK Tamtama Karanganyar and LPKS X Japan, a Japanese-language school in Indonesia. Alongside his regular studies in Computer and Network Engineering (TJKT), he joins the program to extend his learning beyond networking and software into Japanese language and culture.</p>
+          <p class="tr only-id" data-i18n="about.jp.id">Terjemahan: Farid Alfiyansah mengikuti Excellent Japan Class Program, kolaborasi antara SMK Tamtama Karanganyar dan LPKS X Japan, sekolah bahasa Jepang di Indonesia. Di samping pelajaran reguler Teknik Jaringan Komputer dan Telekomunikasi (TJKT), ia mengikuti program ini untuk memperluas pembelajarannya dari jaringan dan perangkat lunak ke bahasa dan budaya Jepang.</p>
+          <p class="links">
+            <a class="btn ghost sm" href="https://lpksxjapan.com/" target="_blank" rel="noopener noreferrer" data-i18n="about.jp.visit">Kunjungi LPKS X Japan</a>
+            <a class="btn ghost sm" href="https://smktamtamaka.sch.id/" target="_blank" rel="noopener noreferrer" data-i18n="about.school.visit">Kunjungi website sekolah</a>
+          </p>
         </div>
       </article>
     </section>
@@ -115,29 +184,29 @@
     <section class="wrap section" aria-labelledby="h-ai">
       <p class="eyebrow">My AI Team</p>
       <h2 id="h-ai" class="sr-only">My AI Team</h2>
-      <p class="lede">AI tools yang membantu proses pengembangan PingTest by RLC. Ide, arahan, keputusan, dan kepemilikan proyek tetap pada Farid dan RLC.</p>
-      <ul class="ai" aria-label="Daftar AI tools">
+      <p class="lede" data-i18n="about.ai.lede">AI tools yang membantu proses pengembangan PingTest by RLC. Ide, arahan, keputusan, dan kepemilikan proyek tetap pada Farid dan RLC.</p>
+      <ul class="ai" aria-label="Daftar AI tools" data-i18n-attr="aria-label:about.ai.list">
         <li><a href="https://claude.ai" target="_blank" rel="noopener noreferrer" aria-label="Claude AI (claude.ai)"><img src="/brand-claude.svg" alt="" width="48" height="48"><span>Claude AI</span></a></li>
         <li><a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer" aria-label="ChatGPT (chatgpt.com)"><img src="/brand-chatgpt.svg" alt="" width="48" height="48"><span>ChatGPT</span></a></li>
         <li><a href="https://grok.com" target="_blank" rel="noopener noreferrer" aria-label="Grok (grok.com)"><img src="/brand-grok.svg" alt="" width="48" height="48"><span>Grok</span></a></li>
         <li><a href="https://www.kimi.com" target="_blank" rel="noopener noreferrer" aria-label="Kimi AI (kimi.com)"><img src="/brand-kimi.svg" alt="" width="48" height="48"><span>Kimi AI</span></a></li>
       </ul>
-      <p class="fine">Semua logo dan nama adalah merek dagang pemiliknya masing-masing, ditampilkan hanya untuk menyebut alat yang digunakan. Tidak ada afiliasi atau dukungan resmi dari pemilik merek.</p>
+      <p class="fine" data-i18n="about.ai.fine">Semua logo dan nama adalah merek dagang pemiliknya masing-masing, ditampilkan hanya untuk menyebut alat yang digunakan. Tidak ada afiliasi atau dukungan resmi dari pemilik merek.</p>
     </section>
 
     <section class="wrap section prose" aria-labelledby="h-proj">
-      <h2 id="h-proj">Tentang proyek</h2>
+      <h2 id="h-proj" data-i18n="about.proj.h">Tentang proyek</h2>
       <div class="cols">
         <div>
-          <h3>Tujuan</h3>
-          <p>Memberi cara sederhana dan jujur untuk memeriksa kualitas internet dari HP maupun laptop, sekaligus menjadi proyek belajar jaringan: memahami perbedaan kecepatan (bandwidth), latency, jitter, dan bufferbloat.</p>
+          <h3 data-i18n="about.goal.h">Tujuan</h3>
+          <p data-i18n="about.goal.p">Memberi cara sederhana dan jujur untuk memeriksa kualitas internet dari HP maupun laptop, sekaligus menjadi proyek belajar jaringan: memahami perbedaan kecepatan (bandwidth), latency, jitter, dan bufferbloat.</p>
         </div>
         <div>
-          <h3>Teknologi</h3>
-          <p>Frontend-only dengan Vite, HTML, CSS, dan JavaScript. Pengukuran memakai <a href="https://github.com/cloudflare/speedtest" target="_blank" rel="noopener noreferrer">@cloudflare/speedtest</a> (MIT). Tanpa backend, tanpa API key, riwayat tersimpan di LocalStorage. Dihosting sebagai static site di Vercel.</p>
+          <h3 data-i18n="about.tech.h">Teknologi</h3>
+          <p data-i18n-html="about.tech.p">Frontend dengan Vite, HTML, CSS, dan JavaScript. Pengukuran memakai <a href="https://github.com/cloudflare/speedtest" target="_blank" rel="noopener noreferrer">@cloudflare/speedtest</a> (MIT). Akun Member dan riwayat cloud memakai Supabase dengan Row Level Security. Dihosting sebagai static site di Vercel dan dapat dipasang sebagai aplikasi (PWA).</p>
         </div>
       </div>
-      <p><a class="btn" href="/#tes">Jalankan tes sekarang</a></p>
+      <p><a class="btn" href="/#tes" data-i18n="about.cta">Jalankan tes sekarang</a></p>
     </section>
   </main>
 
@@ -147,13 +216,13 @@
         <img src="/logo.svg" alt="" width="20" height="24">
         <div>
           <p><strong>PingTest by RLC</strong></p>
-          <p>© 2026 Rogue Logic Creations (RLC) · Ide: Farid Alfiyansah · SMK Tamtama Karanganyar, TJKT</p>
+          <p data-i18n="foot.credit">© 2026 Rogue Logic Creations (RLC) · Ide: Farid Alfiyansah · SMK Tamtama Karanganyar, TJKT</p>
         </div>
       </div>
-      <nav aria-label="Tautan footer">
-        <a href="/">Beranda</a>
+      <nav aria-label="Tautan footer" data-i18n-attr="aria-label:foot.nav">
+        <a href="/" data-i18n="nav.home">Beranda</a>
         <a href="https://github.com/r1dzzz" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://github.com/cloudflare/speedtest" target="_blank" rel="noopener noreferrer">Mesin ukur</a>
+        <a href="https://github.com/cloudflare/speedtest" target="_blank" rel="noopener noreferrer" data-i18n="foot.engine">Mesin ukur</a>
       </nav>
     </div>
   </footer>

@@ -1,3 +1,5 @@
+import { locale } from './i18n.js';
+
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -26,7 +28,7 @@ export function bytesText(bytes) {
 export function dateTimeText(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleString('id-ID', {
+  return d.toLocaleString(locale(), {
     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 }
@@ -42,20 +44,14 @@ export function escapeHtml(s) {
 /**
  * Estimasi bufferbloat = kenaikan HTTP latency saat koneksi terbebani (download/upload)
  * dibanding saat idle. Ini estimasi, bukan pengukuran standar bufferbloat penuh.
+ * Label & deskripsi diterjemahkan di UI lewat kunci bb.l.<grade> dan bb.d.<grade>.
  */
 export function bufferbloat(idle, downLoaded, upLoaded) {
   const loaded = [downLoaded, upLoaded].filter(isNum);
   if (!isNum(idle) || !loaded.length) return null;
   const worst = Math.max(...loaded);
   const increase = Math.max(0, worst - idle);
-  const grades = [
-    [5, 'A+', 'Sangat baik', 'Latency hampir tidak naik saat jaringan penuh.'],
-    [30, 'A', 'Baik', 'Kenaikan kecil; video call dan game online umumnya aman.'],
-    [60, 'B', 'Cukup', 'Terasa sedikit saat ada unduhan besar berjalan bersamaan.'],
-    [200, 'C', 'Kurang baik', 'Panggilan video/game bisa lag ketika ada unduhan atau unggahan.'],
-    [400, 'D', 'Buruk', 'Latency melonjak saat jaringan sibuk; aktivitas real-time terganggu.'],
-    [Infinity, 'F', 'Sangat buruk', 'Latency naik sangat tinggi saat jaringan sibuk.'],
-  ];
-  const g = grades.find((x) => increase < x[0]);
-  return { increase, grade: g[1], label: g[2], desc: g[3], loaded: worst };
+  const limits = [[5, 'A+'], [30, 'A'], [60, 'B'], [200, 'C'], [400, 'D'], [Infinity, 'F']];
+  const grade = limits.find((x) => increase < x[0])[1];
+  return { increase, grade, loaded: worst };
 }

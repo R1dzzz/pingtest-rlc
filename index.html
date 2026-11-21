@@ -1,15 +1,36 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-theme="dark" data-glass="off" data-motion="on">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>PingTest by RLC — Internet Speed Test &amp; Network Diagnostics</title>
-  <meta name="description" content="PingTest by RLC: tes kecepatan internet gratis — download, upload, HTTP latency, jitter, dan estimasi bufferbloat dengan mesin ukur Cloudflare. Proyek SMK Tamtama Karanganyar (TJKT).">
+  <title>PingTest by RLC — Internet Speed Test &amp; RLC Network Diagnostics</title>
+  <meta name="description" content="PingTest by RLC: tes kecepatan internet gratis — download, upload, HTTP latency, jitter, dan estimasi bufferbloat dengan mesin ukur Cloudflare. Proyek Farid Alfiyansah, SMK Tamtama Karanganyar (TJKT).">
   <link rel="canonical" href="__SITE_URL__/">
   <meta name="robots" content="index,follow,max-image-preview:large">
   <meta name="author" content="Rogue Logic Creations (RLC)">
   <meta name="theme-color" content="#09090a">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="dark light">
+  <meta name="google-site-verification" content="RmY1aPcVwK8eslpev0P3NxRUhTdo74k7RhqAZtCqPSI" />
+
+  <script>
+    /* Terapkan tema Member yang tersimpan sebelum render pertama (hanya jika ada sesi login), agar tidak berkedip. */
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('pingtest-rlc:settings:v1') || 'null');
+        var has = false;
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && k.indexOf('sb-') === 0 && k.slice(-11) === '-auth-token') { has = true; break; }
+        }
+        if (s && s.settings && has) {
+          var d = document.documentElement;
+          d.dataset.theme = s.settings.theme === 'light' ? 'light' : 'dark';
+          d.dataset.glass = s.settings.glass ? 'on' : 'off';
+          d.dataset.motion = s.settings.motion === false ? 'off' : 'on';
+        }
+      } catch (e) {}
+    })();
+  </script>
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -19,7 +40,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="PingTest by RLC">
   <meta property="og:locale" content="id_ID">
-  <meta property="og:title" content="PingTest by RLC — Internet Speed Test &amp; Network Diagnostics">
+  <meta property="og:title" content="PingTest by RLC — Internet Speed Test &amp; RLC Network Diagnostics">
   <meta property="og:description" content="Tes kecepatan internet: download, upload, latency, jitter, dan estimasi bufferbloat. Dibuat oleh Rogue Logic Creations (RLC).">
   <meta property="og:url" content="__SITE_URL__/">
   <meta property="og:image" content="__SITE_URL__/og-image.png">
@@ -30,7 +51,6 @@
   <meta name="twitter:title" content="PingTest by RLC — Internet Speed Test">
   <meta name="twitter:description" content="Tes kecepatan internet: download, upload, latency, jitter, dan estimasi bufferbloat.">
   <meta name="twitter:image" content="__SITE_URL__/og-image.png">
-  <meta name="google-site-verification" content="RmY1aPcVwK8eslpev0P3NxRUhTdo74k7RhqAZtCqPSI" />
 
   <script type="application/ld+json">
   {
@@ -41,8 +61,8 @@
         "@id": "__SITE_URL__/#website",
         "url": "__SITE_URL__/",
         "name": "PingTest by RLC",
-        "alternateName": ["PingTest by Farid XI TJKT 2", "Internet Speed Test by RLC", "RLC Network Speed Test"],
-        "inLanguage": "id",
+        "alternateName": ["PingTest by Farid Alfiyansah", "PingTest by Farid XI TJKT 2", "PingTest SMK Tamtama Karanganyar", "Internet Speed Test by RLC", "RLC Network Diagnostics"],
+        "inLanguage": ["id", "en"],
         "publisher": { "@id": "__SITE_URL__/#org" }
       },
       {
@@ -50,12 +70,12 @@
         "@id": "__SITE_URL__/#app",
         "name": "PingTest by RLC",
         "url": "__SITE_URL__/",
-        "description": "Tes kecepatan dan kualitas internet di browser: download, upload, HTTP latency, jitter, dan estimasi bufferbloat.",
+        "description": "Tes kecepatan dan kualitas internet di browser: download, upload, HTTP latency, jitter, dan estimasi bufferbloat. Dapat dipasang sebagai aplikasi (PWA).",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Semua perangkat dengan browser modern",
         "browserRequirements": "Membutuhkan JavaScript",
         "isAccessibleForFree": true,
-        "inLanguage": "id",
+        "inLanguage": ["id", "en"],
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" },
         "creator": { "@id": "__SITE_URL__/#org" }
       },
@@ -73,20 +93,23 @@
 
   <script type="module" src="/main.js"></script>
 </head>
-<body>
-  <a class="skip" href="#tes">Lewati ke konten</a>
+<body data-page="index">
+  <a class="skip" href="#tes" data-i18n="skip">Lewati ke konten</a>
 
   <header class="top">
     <div class="wrap bar">
-      <a class="brand" href="/" aria-label="PingTest by RLC — beranda">
+      <a class="brand" href="/" aria-label="PingTest by RLC" data-i18n-attr="aria-label:brand.home">
         <img src="/logo.svg" alt="" width="22" height="26">
         <span class="brand-name">PingTest</span><span class="brand-by"></span>
       </a>
-      <nav class="nav" aria-label="Navigasi utama">
-        <a href="/#tes" aria-current="page">Tes</a>
-        <a href="/#diagnostik">Diagnostik</a>
-        <a href="/#riwayat">Riwayat</a>
-        <a href="/about">Tentang</a>
+      <div class="actions" id="actions"></div>
+    </div>
+    <div class="wrap">
+      <nav class="nav" aria-label="Navigasi utama" data-i18n-attr="aria-label:nav.label">
+        <a href="/#tes" aria-current="page" data-i18n="nav.test">Tes</a>
+        <a href="/#diagnostik" data-i18n="nav.diag">Diagnostik</a>
+        <a href="/#riwayat" data-i18n="nav.history">Riwayat</a>
+        <a href="/about" data-i18n="nav.about">Tentang</a>
       </nav>
     </div>
   </header>
@@ -95,15 +118,15 @@
     <section id="tes" class="wrap stage" aria-labelledby="h1">
       <div class="stage-head">
         <p class="eyebrow">RLC Network Speed Test</p>
-        <h1 id="h1">PingTest by RLC<span>Tes kecepatan &amp; kualitas internet</span></h1>
-        <p class="lede">Ukur download, upload, latency, jitter, dan estimasi bufferbloat langsung dari browser ke jaringan edge Cloudflare. Angka berasal dari pengukuran nyata, bukan simulasi.</p>
+        <h1 id="h1">PingTest by RLC<span data-i18n="hero.sub">Tes kecepatan &amp; kualitas internet</span></h1>
+        <p class="lede" data-i18n="hero.lede">Ukur download, upload, latency, jitter, dan estimasi bufferbloat langsung dari browser ke jaringan edge Cloudflare. Angka berasal dari pengukuran nyata, bukan simulasi.</p>
       </div>
 
       <div class="test">
         <div class="panel gauge-panel">
-          <h2 class="sr-only">Speedometer</h2>
+          <h2 class="sr-only" data-i18n="gauge.h">Speedometer</h2>
           <div class="gauge" id="gauge" data-dir="down" data-state="idle">
-            <button class="go" id="btn-go" type="button" aria-label="Mulai tes kecepatan"><span>MULAI</span></button>
+            <button class="go" id="btn-go" type="button" aria-label="Mulai tes kecepatan" data-i18n-attr="aria-label:go.aria"><span data-i18n="go.label">MULAI</span></button>
           </div>
 
           <div class="progress" id="progress" hidden><i id="bar"></i></div>
@@ -111,82 +134,83 @@
 
           <div class="controls">
             <fieldset class="seg" id="profiles">
-              <legend class="sr-only">Profil tes</legend>
-              <label><input type="radio" name="profile" value="hemat"><span>Hemat data</span></label>
-              <label><input type="radio" name="profile" value="standar"><span>Standar</span></label>
+              <legend class="sr-only" data-i18n="profile.legend">Profil tes</legend>
+              <label><input type="radio" name="profile" value="hemat"><span data-i18n="profile.saver">Hemat data</span></label>
+              <label><input type="radio" name="profile" value="standar"><span data-i18n="profile.standard">Standar</span></label>
             </fieldset>
-            <button class="btn ghost" id="btn-cancel" type="button" hidden>Batal</button>
-            <button class="btn" id="btn-retry" type="button" hidden>Ulangi tes</button>
+            <button class="btn ghost" id="btn-cancel" type="button" hidden data-i18n="btn.cancel">Batal</button>
+            <button class="btn" id="btn-retry" type="button" hidden data-i18n="btn.retry">Ulangi tes</button>
+            <button class="btn ghost" id="btn-share" type="button" hidden data-member><span data-i18n="btn.share">Bagikan hasil</span></button>
           </div>
           <p class="hint" id="profile-hint"></p>
         </div>
 
         <div class="panel ledger-panel">
-          <h2 class="sr-only">Hasil tes</h2>
+          <h2 class="sr-only" data-i18n="ledger.h">Hasil tes</h2>
           <ul class="ledger" id="ledger">
             <li>
               <button class="row dl" type="button" data-focus="down" aria-pressed="true">
-                <span class="k">Download <em id="t-down">menunggu</em></span>
+                <span class="k"><span data-i18n="m.download">Download</span> <em id="t-down"></em></span>
                 <span class="v"><b id="m-down">—</b><small>Mbps</small></span>
               </button>
             </li>
             <li>
               <button class="row ul" type="button" data-focus="up" aria-pressed="false">
-                <span class="k">Upload <em id="t-up">menunggu</em></span>
+                <span class="k"><span data-i18n="m.upload">Upload</span> <em id="t-up"></em></span>
                 <span class="v"><b id="m-up">—</b><small>Mbps</small></span>
               </button>
             </li>
             <li>
               <div class="row">
-                <span class="k">Latency (HTTP) <em id="t-lat">menunggu</em></span>
+                <span class="k"><span data-i18n="m.latency">Latency (HTTP)</span> <em id="t-lat"></em></span>
                 <span class="v"><b id="m-lat">—</b><small>ms</small></span>
               </div>
             </li>
             <li>
               <div class="row">
-                <span class="k">Jitter <em id="t-jit">menunggu</em></span>
+                <span class="k"><span data-i18n="m.jitter">Jitter</span> <em id="t-jit"></em></span>
                 <span class="v"><b id="m-jit">—</b><small>ms</small></span>
               </div>
             </li>
           </ul>
           <dl class="meta">
-            <div><dt>Data terpakai</dt><dd id="m-bytes">—</dd></div>
-            <div><dt>Durasi</dt><dd id="m-dur">—</dd></div>
+            <div><dt data-i18n="m.data">Data terpakai</dt><dd id="m-bytes">—</dd></div>
+            <div><dt data-i18n="m.duration">Durasi</dt><dd id="m-dur">—</dd></div>
           </dl>
-          <p class="consent">Dengan menekan MULAI, Anda setuju hasil tes dapat dikumpulkan Cloudflare untuk insight agregat. <a href="#privasi">Detail privasi</a></p>
+          <p class="consent" id="consent"></p>
         </div>
       </div>
       <noscript><p class="notice">PingTest membutuhkan JavaScript untuk menjalankan tes.</p></noscript>
     </section>
 
     <section id="diagnostik" class="wrap section" aria-labelledby="h-diag">
-      <h2 id="h-diag">Diagnostik lanjutan</h2>
-      <p class="lede">Latency saat jaringan idle dibandingkan saat sedang penuh. Selisihnya menunjukkan seberapa jauh antrean (bufferbloat) memengaruhi panggilan video dan game.</p>
+      <h2 id="h-diag" data-i18n="diag.h">Diagnostik lanjutan</h2>
+      <p class="lede" data-i18n="diag.lede">Latency saat jaringan idle dibandingkan saat sedang penuh. Selisihnya menunjukkan seberapa jauh antrean (bufferbloat) memengaruhi panggilan video dan game.</p>
 
       <div class="diag">
         <article class="panel" aria-labelledby="h-lat">
-          <h3 id="h-lat">Latency: idle vs terbebani</h3>
+          <h3 id="h-lat" data-i18n="diag.lat.h">Latency: idle vs terbebani</h3>
           <div class="bars" id="lat-bars"></div>
-          <p class="fine">HTTP latency = waktu respons permintaan HTTP ke edge Cloudflare. Ini <strong>bukan</strong> ICMP ping.</p>
+          <p class="fine" data-i18n-html="diag.lat.fine">HTTP latency = waktu respons permintaan HTTP ke edge Cloudflare. Ini <strong>bukan</strong> ICMP ping.</p>
         </article>
 
         <article class="panel bloat" aria-labelledby="h-bloat">
-          <h3 id="h-bloat">Estimasi bufferbloat</h3>
+          <h3 id="h-bloat" data-i18n="diag.bloat.h">Estimasi bufferbloat</h3>
           <div class="bloat-body">
             <div class="grade" id="bloat-grade" aria-hidden="true">—</div>
             <div>
-              <p class="bloat-title" id="bloat-title">Belum ada data</p>
-              <p class="fine" id="bloat-desc">Jalankan tes untuk melihat estimasi.</p>
+              <p class="bloat-title" id="bloat-title"></p>
+              <p class="fine" id="bloat-desc"></p>
             </div>
           </div>
         </article>
 
         <article class="panel wide" aria-labelledby="h-chart">
-          <h3 id="h-chart">Grafik</h3>
-          <div class="tabs" role="tablist" aria-label="Jenis grafik">
-            <button role="tab" id="tab-thr" aria-selected="true" aria-controls="chart" data-chart="thr">Throughput</button>
-            <button role="tab" id="tab-lat" aria-selected="false" aria-controls="chart" data-chart="lat" tabindex="-1">Latency</button>
-            <button role="tab" id="tab-his" aria-selected="false" aria-controls="chart" data-chart="his" tabindex="-1">Riwayat</button>
+          <h3 id="h-chart" data-i18n="chart.h">Grafik</h3>
+          <div class="tabs" role="tablist" aria-label="Jenis grafik" data-i18n-attr="aria-label:chart.tabs">
+            <button role="tab" id="tab-thr" aria-selected="true" aria-controls="chart" data-chart="thr" data-i18n="chart.thr">Throughput</button>
+            <button role="tab" id="tab-lat" aria-selected="false" aria-controls="chart" data-chart="lat" tabindex="-1" data-i18n="chart.lat">Latency</button>
+            <button role="tab" id="tab-his" aria-selected="false" aria-controls="chart" data-chart="his" tabindex="-1" data-i18n="chart.his">Riwayat</button>
           </div>
           <p class="fine" id="chart-desc"></p>
           <div class="chart" id="chart" role="tabpanel" tabindex="0"></div>
@@ -194,7 +218,7 @@
         </article>
 
         <article class="panel" aria-labelledby="h-conn">
-          <h3 id="h-conn">Informasi koneksi browser</h3>
+          <h3 id="h-conn" data-i18n="conn.h">Informasi koneksi browser</h3>
           <dl class="kv" id="conn"></dl>
           <p class="fine" id="conn-note"></p>
         </article>
@@ -204,42 +228,51 @@
     <section id="riwayat" class="wrap section" aria-labelledby="h-his">
       <div class="his-head">
         <div>
-          <h2 id="h-his">Riwayat tes</h2>
-          <p class="lede">Disimpan hanya di browser ini (LocalStorage), maksimal 100 hasil terakhir.</p>
+          <h2 id="h-his" data-i18n="his.h">Riwayat tes</h2>
+          <p class="lede" id="his-lede"></p>
         </div>
         <div class="his-actions">
-          <button class="btn ghost sm" id="exp-csv" type="button">Ekspor CSV</button>
-          <button class="btn ghost sm" id="exp-json" type="button">Ekspor JSON</button>
-          <button class="btn ghost sm danger" id="his-clear" type="button">Hapus semua</button>
+          <button class="btn ghost sm" id="exp-csv" type="button" data-member><span data-i18n="his.csv">Ekspor CSV</span></button>
+          <button class="btn ghost sm" id="exp-json" type="button" data-member><span data-i18n="his.json">Ekspor JSON</span></button>
+          <button class="btn ghost sm" id="his-share" type="button" data-member><span data-i18n="his.share">Bagikan riwayat</span></button>
+          <button class="btn ghost sm danger" id="his-clear" type="button"><span data-i18n="his.clear">Hapus semua</span></button>
         </div>
       </div>
-      <p class="notice" id="his-warn" hidden>Penyimpanan browser tidak tersedia (mungkin mode privat). Riwayat hanya bertahan selama tab ini terbuka.</p>
+      <div class="gate" id="his-gate" hidden>
+        <p id="his-gate-text"></p>
+        <button class="btn sm" id="his-login" type="button" data-i18n="auth.cta">Masuk / Daftar</button>
+      </div>
+      <div class="gate" id="his-import-box" hidden>
+        <p id="his-import-text"></p>
+        <button class="btn sm" id="his-import" type="button" data-i18n="his.import">Unggah ke akun</button>
+      </div>
+      <p class="notice" id="his-warn" hidden></p>
       <ol class="history" id="history"></ol>
-      <p class="empty" id="his-empty">Belum ada riwayat. Hasil tes akan muncul di sini.</p>
+      <p class="empty" id="his-empty" data-i18n="his.empty">Belum ada riwayat. Hasil tes akan muncul di sini.</p>
     </section>
 
     <section id="privasi" class="wrap section prose" aria-labelledby="h-how">
-      <h2 id="h-how">Cara kerja, akurasi &amp; privasi</h2>
+      <h2 id="h-how" data-i18n="how.h">Cara kerja, akurasi &amp; privasi</h2>
       <div class="cols">
         <div>
-          <h3>Apa yang diukur</h3>
+          <h3 data-i18n="how.measured.h">Apa yang diukur</h3>
           <ul>
-            <li><strong>Download &amp; upload</strong> dalam Mbps (megabit per detik), dari beberapa permintaan HTTP berukuran bertahap ke edge Cloudflare.</li>
-            <li><strong>Latency</strong> adalah HTTP latency (waktu respons permintaan), bukan ICMP ping. <strong>Jitter</strong> adalah rata-rata selisih antar sampel latency.</li>
-            <li><strong>Latency terbebani</strong> diukur saat unduhan/unggahan berjalan; selisihnya dengan latency idle dipakai sebagai <strong>estimasi bufferbloat</strong>.</li>
+            <li data-i18n-html="how.m1"><strong>Download &amp; upload</strong> dalam Mbps (megabit per detik), dari beberapa permintaan HTTP berukuran bertahap ke edge Cloudflare.</li>
+            <li data-i18n-html="how.m2"><strong>Latency</strong> adalah HTTP latency (waktu respons permintaan), bukan ICMP ping. <strong>Jitter</strong> adalah rata-rata selisih antar sampel latency.</li>
+            <li data-i18n-html="how.m3"><strong>Latency terbebani</strong> diukur saat unduhan/unggahan berjalan; selisihnya dengan latency idle dipakai sebagai <strong>estimasi bufferbloat</strong>.</li>
           </ul>
-          <h3>Yang tidak diukur</h3>
-          <p><strong>Packet loss tidak ditampilkan</strong> karena membutuhkan server TURN yang tidak dikonfigurasi di situs ini. Jika sebuah metrik gagal diukur, situs menampilkan “—” dan alasannya, bukan angka tebakan.</p>
+          <h3 data-i18n="how.not.h">Yang tidak diukur</h3>
+          <p data-i18n-html="how.not.p"><strong>Packet loss tidak ditampilkan</strong> karena membutuhkan server TURN yang tidak dikonfigurasi di situs ini. Jika sebuah metrik gagal diukur, situs menampilkan “—” dan alasannya, bukan angka tebakan.</p>
         </div>
         <div>
-          <h3>Privasi</h3>
+          <h3 data-i18n="how.priv.h">Privasi</h3>
           <ul>
-            <li>Mesin pengukur: <a href="https://github.com/cloudflare/speedtest" rel="noopener noreferrer" target="_blank">@cloudflare/speedtest</a> (lisensi MIT). Permintaan dikirim langsung dari browser Anda ke <code>speed.cloudflare.com</code>.</li>
-            <li id="privacy-cf">Cloudflare dapat mengumpulkan hasil tes untuk menghitung insight agregat kualitas internet. Alamat IP Anda tentu terlihat oleh server tujuan, seperti pada setiap koneksi internet.</li>
-            <li>Riwayat hanya ada di LocalStorage perangkat Anda. Situs ini tidak memakai akun, cookie pelacak, atau analitik, dan tidak menyimpan data Anda di server.</li>
+            <li data-i18n-html="how.p1">Mesin pengukur: <a href="https://github.com/cloudflare/speedtest" rel="noopener noreferrer" target="_blank">@cloudflare/speedtest</a> (lisensi MIT). Permintaan dikirim langsung dari browser Anda ke <code>speed.cloudflare.com</code>.</li>
+            <li id="privacy-cf"></li>
+            <li data-i18n-html="how.p3">Tanpa login, riwayat hanya ada di LocalStorage perangkat Anda. Jika Anda membuat akun Member, akun dan riwayat tes Anda disimpan di Supabase dan hanya dapat dibaca oleh akun Anda sendiri. Situs ini tidak memakai cookie pelacak atau analitik.</li>
           </ul>
-          <h3>Pemakaian kuota</h3>
-          <p>Profil <strong>Hemat data</strong> memakai maksimal sekitar 48 MB. Profil <strong>Standar</strong> berhenti memperbesar ukuran file begitu permintaan melewati 1 detik, namun pada koneksi cepat tetap bisa memakai ratusan MB. Jumlah data yang benar-benar terpakai ditampilkan setelah tes.</p>
+          <h3 data-i18n="how.data.h">Pemakaian kuota</h3>
+          <p data-i18n-html="how.data.p">Profil <strong>Hemat data</strong> memakai maksimal sekitar 48 MB. Profil <strong>Standar</strong> berhenti memperbesar ukuran file begitu permintaan melewati 1 detik, namun pada koneksi cepat tetap bisa memakai ratusan MB. Jumlah data yang benar-benar terpakai ditampilkan setelah tes.</p>
         </div>
       </div>
     </section>
@@ -251,13 +284,13 @@
         <img src="/logo.svg" alt="" width="20" height="24">
         <div>
           <p><strong>PingTest by RLC</strong></p>
-          <p>© 2026 Rogue Logic Creations (RLC) · Ide: Farid Alfiyansah · SMK Tamtama Karanganyar, TJKT</p>
+          <p data-i18n="foot.credit">© 2026 Rogue Logic Creations (RLC) · Ide: Farid Alfiyansah · SMK Tamtama Karanganyar, TJKT</p>
         </div>
       </div>
-      <nav aria-label="Tautan footer">
-        <a href="/about">Tentang</a>
+      <nav aria-label="Tautan footer" data-i18n-attr="aria-label:foot.nav">
+        <a href="/about" data-i18n="nav.about">Tentang</a>
         <a href="https://github.com/r1dzzz" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://github.com/cloudflare/speedtest" target="_blank" rel="noopener noreferrer">Mesin ukur</a>
+        <a href="https://github.com/cloudflare/speedtest" target="_blank" rel="noopener noreferrer" data-i18n="foot.engine">Mesin ukur</a>
       </nav>
     </div>
   </footer>

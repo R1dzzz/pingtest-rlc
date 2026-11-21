@@ -1,6 +1,7 @@
 // Informasi koneksi dari browser (Network Information API). Hanya ada di sebagian
 // browser (umumnya Chrome/Android). Nilainya ESTIMASI browser, bukan hasil tes.
 import { isNum } from './util.js';
+import { t } from './i18n.js';
 
 export function getConnection() {
   return navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
@@ -21,15 +22,16 @@ export function readNetInfo() {
 
 export function renderNetInfo(dl) {
   const n = readNetInfo();
+  const na = t('conn.na');
   const rows = [
-    ['Status browser', n.online === null ? 'Tidak diketahui' : n.online ? 'Online' : 'Offline'],
+    [t('conn.status'), n.online === null ? t('conn.unknown') : n.online ? t('conn.online') : t('conn.offline')],
   ];
   if (n.supported) {
-    rows.push(['Tipe efektif', n.effectiveType ? n.effectiveType.toUpperCase() : 'Tidak tersedia']);
-    rows.push(['Downlink (estimasi)', n.downlink !== null ? n.downlink + ' Mbps' : 'Tidak tersedia']);
-    rows.push(['RTT (estimasi)', n.rtt !== null ? n.rtt + ' ms' : 'Tidak tersedia']);
-    rows.push(['Mode hemat data', n.saveData === null ? 'Tidak tersedia' : n.saveData ? 'Aktif' : 'Nonaktif']);
-    rows.push(['Jenis koneksi', n.type || 'Tidak tersedia']);
+    rows.push([t('conn.eff'), n.effectiveType ? n.effectiveType.toUpperCase() : na]);
+    rows.push([t('conn.down'), n.downlink !== null ? n.downlink + ' Mbps' : na]);
+    rows.push([t('conn.rtt'), n.rtt !== null ? n.rtt + ' ms' : na]);
+    rows.push([t('conn.save'), n.saveData === null ? na : n.saveData ? t('conn.on') : t('conn.off')]);
+    rows.push([t('conn.type'), n.type || na]);
   }
   dl.replaceChildren();
   for (const [k, v] of rows) {
