@@ -12,7 +12,7 @@ function siteUrl() {
   if (env) return env.replace(/\/+$/, '');
   const v = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   if (v) return 'https://' + v.replace(/^https?:\/\//, '').replace(/\/+$/, '');
-  return 'https://pingtest-by-rlc.vercel.app';
+  return 'https://pingtest-rlc.vercel.app';
 }
 
 // File statis yang disalin apa adanya ke dist/ (semua berada di root repo agar mudah diunggah dari HP).
