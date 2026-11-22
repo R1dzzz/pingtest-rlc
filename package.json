@@ -1,6 +1,6 @@
 {
   "name": "pingtest-by-rlc",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "description": "PingTest by RLC — tes kecepatan & kualitas internet (download, upload, latency, jitter, bufferbloat) memakai @cloudflare/speedtest. Frontend-only, static site.",

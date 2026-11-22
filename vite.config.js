@@ -1,9 +1,14 @@
 import { defineConfig } from 'vite';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { ANDROID_LATEST, APK_URL, ITCH_URL } from './site.config.js';
+
 const root = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
+// ID build unik per build: dipakai service worker, version.json, dan pemeriksa pembaruan di aplikasi.
+const BUILD_ID = Date.now().toString(36);
 
 // Alamat situs untuk canonical, Open Graph, sitemap, dan robots.
 // Prioritas: variabel SITE_URL (opsional, atur di Vercel) → domain produksi Vercel → tebakan default.
@@ -43,7 +48,17 @@ function rlcSite() {
       // Service Worker: sisipkan ID build agar cache lama dibuang setiap ada deploy baru.
       this.emitFile({
         type: 'asset', fileName: 'sw.js',
-        source: readFileSync(resolve(root, 'sw.js'), 'utf8').replace('__BUILD_ID__', Date.now().toString(36)),
+        source: readFileSync(resolve(root, 'sw.js'), 'utf8').replace('__BUILD_ID__', BUILD_ID),
+      });
+      // version.json: dipakai Pemeriksa Pembaruan (website & aplikasi Android). Tidak berisi data pribadi.
+      let apkBytes = 0;
+      try { apkBytes = statSync(resolve(root, 'PingTest-by-RLC-Studio.apk')).size; } catch { /* APK tidak ada */ }
+      this.emitFile({
+        type: 'asset', fileName: 'version.json',
+        source: JSON.stringify({
+          web: { version: pkg.version, build: BUILD_ID },
+          android: { ...ANDROID_LATEST, apk: APK_URL, apkBytes, itch: ITCH_URL },
+        }, null, 2) + '\n',
       });
       this.emitFile({
         type: 'asset', fileName: 'robots.txt',
@@ -61,6 +76,7 @@ function rlcSite() {
 
 export default defineConfig({
   publicDir: false,
+  define: { __APP_VERSION__: JSON.stringify(pkg.version), __BUILD_ID__: JSON.stringify(BUILD_ID) },
   plugins: [rlcSite()],
   build: {
     target: 'es2020',

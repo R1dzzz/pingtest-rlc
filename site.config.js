@@ -15,5 +15,9 @@ export const PREF_KEY = 'pingtest-rlc:prefs:v1';
 // Unduhan aplikasi Android (dibuat dengan webtoappcreator.com).
 // APK disimpan di repo ini dan dilayani dari root situs. Ganti APK_BYTES jika berkas APK diperbarui.
 export const APK_URL = '/PingTest-by-RLC-Studio.apk';
-export const APK_BYTES = 6196441;
+export const APK_BYTES = 6086865;
 export const ITCH_URL = 'https://f-alfiyansah.itch.io/pingtest-by-rlc';
+
+// Versi aplikasi Android TERBARU yang tersedia untuk diunduh (dipakai Pemeriksa Pembaruan via /version.json).
+// Naikkan angka ini setiap kali Anda merilis APK baru (versionCode harus lebih besar dari APK sebelumnya).
+export const ANDROID_LATEST = { versionName: '2.0.0', versionCode: 2 };

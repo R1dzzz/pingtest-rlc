@@ -424,3 +424,34 @@ a.dl-item:hover { border-color: var(--dl); }
 .dl-txt b { font-weight: 600; font-size: 15px; }
 .dl-txt small { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 .dl-badge { flex: none; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); padding: 3px 7px; }
+
+/* Perangkat, versi & pembaruan (Pengaturan) */
+html[data-app='android'] .dl-section { display: none !important; }
+.set-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+.app-ver .kv { margin: 0; }
+.upd { margin-top: 10px; }
+.upd p { margin: 0 0 8px; font-size: 14px; }
+.upd .ok { color: var(--dl); }
+.upd .bad { color: var(--bad); }
+#set-theme button { padding-inline: 14px; }
+
+/* Analisis hasil */
+.ins-lock { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.ins-lock p { margin: 0; color: var(--muted); flex: 1 1 260px; }
+.ucs { list-style: none; margin: 14px 0 6px; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.uc { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); background: var(--panel-2); }
+.uc-i { font-size: 14px; }
+.uc-v { font: 600 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.uc.good .uc-i, .uc.good .uc-v { color: var(--dl); }
+.uc.ok .uc-i, .uc.ok .uc-v { color: #f5c542; }
+.uc.poor .uc-i, .uc.poor .uc-v { color: var(--bad); }
+.uc.na .uc-i, .uc.na .uc-v { color: var(--faint); }
+.ins-cmp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0; }
+.chip { font: 500 13px var(--mono); padding: 4px 9px; border: 1px solid var(--line); }
+.chip b { font-weight: 600; margin-right: 4px; color: var(--muted); }
+.chip.up { color: var(--dl); border-color: var(--dl); }
+.chip.down { color: var(--bad); border-color: var(--bad); }
+.chip.flat { color: var(--muted); }
+.insight h4 { margin: 14px 0 6px; font: 600 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.tips { margin: 0 0 8px; padding-left: 18px; color: var(--muted); }
+.tips li { margin: 4px 0; max-width: 70ch; }

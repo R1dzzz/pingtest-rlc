@@ -2,6 +2,7 @@
 // Hanya memakai URL proyek + ANON/PUBLISHABLE key (aman di frontend). Service Role Key TIDAK PERNAH dipakai di sini.
 // Keamanan data dijaga oleh Row Level Security di database (lihat supabase-schema.sql).
 import { isNum } from './util.js';
+import { resolvedTheme } from './settings.js';
 
 const URL = (import.meta.env.VITE_SUPABASE_URL || '').trim();
 const KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '').trim();
@@ -146,16 +147,50 @@ export async function deleteAllResults(uid) {
 }
 
 /* ---------- Pengaturan personal ---------- */
+// Kolom `theme/glass/motion/sound/lang` sudah ada sejak versi 1. Pengaturan baru (mode tema "system",
+// getar, layar tetap menyala, layar penuh, konfirmasi keluar) disimpan di kolom jsonb `prefs`
+// (lihat supabase-migration-v2.sql). Jika kolom itu belum ada, aplikasi tetap jalan: nilai baru
+// hanya disimpan di perangkat sampai migrasi dijalankan.
+let prefsColumn = true;
+const isPrefsError = (e) => !!e && (e.code === '42703' || e.code === 'PGRST204' || /prefs/i.test(String(e.message || '')));
+
 export async function loadSettings() {
   const sb = await getClient();
+  if (prefsColumn) {
+    const r = await sb.from('user_settings').select('theme,glass,motion,sound,lang,prefs').maybeSingle();
+    if (!r.error) return r.data || null;
+    if (!isPrefsError(r.error)) throw r.error;
+    prefsColumn = false;
+  }
   const { data, error } = await sb.from('user_settings').select('theme,glass,motion,sound,lang').maybeSingle();
   if (error) throw error;
   return data || null;
 }
+
+/** Ubah baris database menjadi objek pengaturan aplikasi. */
+export function rowToSettings(row) {
+  const p = (row && row.prefs && typeof row.prefs === 'object') ? row.prefs : {};
+  return {
+    theme: ['dark', 'light', 'system'].includes(p.themeMode) ? p.themeMode : row.theme,
+    glass: row.glass, motion: row.motion, sound: row.sound,
+    haptics: p.haptics, keepAwake: p.keepAwake, fullscreen: p.fullscreen, exitConfirm: p.exitConfirm,
+  };
+}
+
 export async function saveSettings(s, lang) {
   const sb = await getClient();
-  const row = { theme: s.theme, glass: s.glass, motion: s.motion, sound: s.sound, updated_at: new Date().toISOString() };
-  if (lang) row.lang = lang;
-  const { error } = await sb.from('user_settings').upsert(row, { onConflict: 'user_id' });
+  const base = {
+    theme: s.theme === 'system' ? resolvedTheme('system') : s.theme, // kolom lama hanya menerima dark/light
+    glass: s.glass, motion: s.motion, sound: s.sound, updated_at: new Date().toISOString(),
+  };
+  if (lang) base.lang = lang;
+  if (prefsColumn) {
+    const prefs = { themeMode: s.theme, haptics: s.haptics, keepAwake: s.keepAwake, fullscreen: s.fullscreen, exitConfirm: s.exitConfirm };
+    const r = await sb.from('user_settings').upsert({ ...base, prefs }, { onConflict: 'user_id' });
+    if (!r.error) return;
+    if (!isPrefsError(r.error)) throw r.error;
+    prefsColumn = false;
+  }
+  const { error } = await sb.from('user_settings').upsert(base, { onConflict: 'user_id' });
   if (error) throw error;
 }

@@ -20,6 +20,8 @@ import {
   openDialog, closeDialog, wireDialog, refreshLocks,
 } from './shell.js';
 import { listResults, insertResult, insertMany, deleteResult, deleteAllResults } from './cloud.js';
+import { haptic, setTestRunning } from './device.js';
+import { useCases, tips, compare } from './insight.js';
 import { renderShareImage, renderHistoryImage, historyStats, canWebShareFiles, canCopyImage } from './share.js';
 
 initShell();
@@ -78,6 +80,7 @@ function setState(s) {
   els.progress.hidden = !running;
   $$('input[name=profile]').forEach((i) => { i.disabled = running; });
   gauge.showReadout(s !== 'idle');
+  setTestRunning(running);
 }
 
 function paintTags() {
@@ -299,6 +302,7 @@ onAuthChange(({ member, changed }) => {
     if (chartKind === 'his') renderChart();
   }
   setState(state);
+  renderInsight();
 });
 
 $('#history').addEventListener('click', async (ev) => {
@@ -499,6 +503,41 @@ async function saveResult(entry) {
   return 'local';
 }
 
+/* ---------- Analisis hasil (Member) ---------- */
+let insightData = null;
+const LVL_ICON = { good: '●', ok: '◐', poor: '○', na: '–' };
+function deltaChip(label, p, lowerIsBetter) {
+  if (p === null || !Number.isFinite(p)) return '';
+  const r = Math.round(p);
+  const good = lowerIsBetter ? r < 0 : r > 0;
+  const cls = r === 0 ? 'flat' : good ? 'up' : 'down';
+  const arrow = r === 0 ? '→' : r > 0 ? '▲' : '▼';
+  return `<span class="chip ${cls}"><b>${escapeHtml(label)}</b> ${arrow} ${r > 0 ? '+' : ''}${r}%</span>`;
+}
+function renderInsight() {
+  const box = $('#ins-body');
+  if (!box) return;
+  if (!isMember()) {
+    box.innerHTML = `<div class="ins-lock"><p>${escapeHtml(t('ins.guest'))}</p><button class="btn ghost sm" type="button" id="ins-login">${escapeHtml(t('auth.cta'))}</button></div>`;
+    $('#ins-login').addEventListener('click', () => requireMember(t('gate.insight'), () => renderInsight()));
+    return;
+  }
+  if (!insightData) { box.innerHTML = `<p class="fine">${escapeHtml(t('ins.empty'))}</p>`; return; }
+  const { entry, prev, partial } = insightData;
+  const cases = useCases(entry).map((c) => `
+    <li class="uc ${c.level}"><span class="uc-i" aria-hidden="true">${LVL_ICON[c.level]}</span>
+      <span class="uc-t">${escapeHtml(t('ins.uc.' + c.key))}</span><span class="uc-v">${escapeHtml(t('ins.lv.' + c.level))}</span></li>`).join('');
+  const tp = tips(entry, partial).map((k) => `<li>${escapeHtml(t('ins.tip.' + k))}</li>`).join('');
+  const cmp = compare(entry, prev);
+  const chips = cmp ? deltaChip(t('gauge.down'), cmp.down, false) + deltaChip(t('gauge.up'), cmp.up, false) + deltaChip('Latency', cmp.lat, true) : '';
+  box.innerHTML = `
+    <ul class="ucs">${cases}</ul>
+    ${chips ? `<p class="ins-cmp"><span class="fine">${escapeHtml(t('ins.vsPrev'))}</span> ${chips}</p>` : `<p class="fine">${escapeHtml(t('ins.noPrev'))}</p>`}
+    <h4>${escapeHtml(t('ins.tips'))}</h4>
+    <ul class="tips">${tp}</ul>
+    <p class="fine">${escapeHtml(t('ins.disclaimer'))}</p>`;
+}
+
 function start() {
   if (state === 'running') return;
   lastEntry = null;
@@ -507,6 +546,9 @@ function start() {
   paintGaugeTexts();
   setStatus(() => t(ACTIVITY.connect));
   playSound('start');
+  haptic('start');
+  insightData = null;
+  renderInsight();
   const t0 = performance.now();
   const tick = setInterval(() => {
     if (state !== 'running') { clearInterval(tick); return; }
@@ -538,6 +580,7 @@ function start() {
       lastEntry = entry;
       setState('done');
       playSound('done');
+      haptic('done');
       els.bar.style.width = '100%';
       paintMetrics(snap, true);
       els.m.dur.textContent = isNum(durationMs) ? (durationMs / 1000).toFixed(1) + ' ' + t('unit.sec') : '—';
@@ -549,6 +592,8 @@ function start() {
       let saveNote = '';
       const base = () => (partial ? t('status.donePartial', { note: t(note || 'note.partial') }) : t('status.done')) + (fast ? t('status.fast') : '');
       setStatus(() => base());
+      insightData = { entry, prev: history[0] || null, partial: !!partial };
+      renderInsight();
       const where = await saveResult(entry);
       saveNote = where;
       setStatus(() => base() + (saveNote === 'cloud' ? t('status.cloudSaved') : saveNote === 'cloudFail' ? t('status.cloudFail') : ''));
@@ -557,6 +602,7 @@ function start() {
       clearInterval(tick);
       setState('failed');
       playSound('error');
+      haptic('error');
       const keep = current;
       noteKey = 'gauge.failed';
       gauge.setValue(null);
@@ -601,11 +647,13 @@ function repaintAll() {
   renderDiagnostics();
   renderChart();
   renderHistory();
+  renderInsight();
   if (state === 'running') els.m.dur.textContent = els.m.dur.textContent.replace(/\s\S+$/, ' ' + t('unit.sec'));
 }
 onLangChange(repaintAll);
 onSettingsChange(() => { renderDiagnostics(); renderChart(); });
 watchNetInfo(paintConn);
+renderInsight();
 
 /* ---------- Inisialisasi ---------- */
 paintStaticTexts();

@@ -13,6 +13,7 @@
 
   <script>
     (function () {
+      if (window.RLCNative) document.documentElement.dataset.app = 'android';
       try {
         var s = JSON.parse(localStorage.getItem('pingtest-rlc:settings:v1') || 'null');
         var has = false;
@@ -22,7 +23,9 @@
         }
         if (s && s.settings && has) {
           var d = document.documentElement;
-          d.dataset.theme = s.settings.theme === 'light' ? 'light' : 'dark';
+          var m = s.settings.theme, dark = !(window.matchMedia && !matchMedia('(prefers-color-scheme: dark)').matches);
+          d.dataset.theme = m === 'light' ? 'light' : m === 'system' ? (dark ? 'dark' : 'light') : 'dark';
+          d.dataset.themeMode = m === 'light' || m === 'system' ? m : 'dark';
           d.dataset.glass = s.settings.glass ? 'on' : 'off';
           d.dataset.motion = s.settings.motion === false ? 'off' : 'on';
         }

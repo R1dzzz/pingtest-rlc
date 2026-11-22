@@ -2,11 +2,15 @@
 // aksi tertunda (dilanjutkan otomatis setelah login), pemasangan PWA, dan Service Worker.
 import { APK_URL, APK_BYTES, ITCH_URL } from './site.config.js';
 import { t, locale, initLang, setLang, getLang, onLangChange, applyDom, isManual } from './i18n.js';
-import { applySettings, resetToGuest, cacheSettings, getSettings, DEFAULTS } from './settings.js';
+import { applySettings, resetToGuest, cacheSettings, getSettings, onSettingsChange, DEFAULTS } from './settings.js';
+import {
+  haptic, setDeviceState, nativeInfo, isAndroidApp, fullscreenSupported, setFullscreen, onFullscreenExit,
+  shareApp, rateApp, openExternal, checkForUpdate, reloadForUpdate, refreshExitLabels, WEB_VERSION,
+} from './device.js';
 import { setSoundEnabled } from './sound.js';
 import {
   cloudConfigured, mayHaveSession, initAuth, signIn, signUp, signOut, requestReset, setNewPassword,
-  authErrorKey, loadSettings, saveSettings,
+  authErrorKey, loadSettings, saveSettings, rowToSettings,
 } from './cloud.js';
 import { $, $$ } from './util.js';
 
@@ -285,6 +289,7 @@ async function applySession(session, event) {
     resetToGuest();
     setSoundEnabled(false);
   }
+  setDeviceState({ member, settings: getSettings() });
   paintHeader();
   refreshLocks();
   paintSettings();
@@ -302,11 +307,13 @@ async function applySession(session, event) {
   if (!member && wasMember && event === 'SIGNED_OUT') toast(t('auth.ok.signedOut'));
 }
 
+const stripUndef = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined));
+
 async function pullSettings() {
   try {
     const row = await loadSettings();
     if (row) {
-      applySettings({ theme: row.theme, glass: row.glass, motion: row.motion, sound: row.sound });
+      applySettings({ ...getSettings(), ...stripUndef(rowToSettings(row)) });
       if (row.lang && !isManual() && row.lang !== getLang()) { setLang(row.lang, true); }
       else if (isManual() && row.lang !== getLang()) { saveSettings(getSettings(), getLang()).catch(() => {}); }
     } else {
@@ -349,6 +356,7 @@ function buildSettingsDialog() {
           <div class="seg" id="set-theme">
             <button type="button" data-theme="dark" data-member><span data-i18n="set.dark"></span></button>
             <button type="button" data-theme="light" data-member><span data-i18n="set.light"></span></button>
+            <button type="button" data-theme="system" data-member><span data-i18n="set.system"></span></button>
           </div>
         </div>
         <div class="set-row"><span data-i18n="set.glass"></span>
@@ -360,12 +368,35 @@ function buildSettingsDialog() {
       </section>
 
       <section class="set-sec">
+        <h3 data-i18n="set.device"></h3>
+        <div class="set-row" data-feat="haptics"><span><span data-i18n="set.haptics"></span><small class="fine" data-i18n="set.hapticsHint"></small></span>
+          <button type="button" class="switch" role="switch" data-key="haptics" data-member data-i18n-attr="aria-label:set.haptics" aria-label="Haptic"><i></i></button></div>
+        <div class="set-row" data-feat="keepAwake"><span><span data-i18n="set.keepAwake"></span><small class="fine" data-i18n="set.keepAwakeHint"></small></span>
+          <button type="button" class="switch" role="switch" data-key="keepAwake" data-member data-i18n-attr="aria-label:set.keepAwake" aria-label="Keep screen on"><i></i></button></div>
+        <div class="set-row" data-feat="fullscreen"><span><span data-i18n="set.fullscreen"></span><small class="fine" data-i18n="set.fullscreenHint"></small></span>
+          <button type="button" class="switch" role="switch" data-key="fullscreen" data-member data-i18n-attr="aria-label:set.fullscreen" aria-label="Fullscreen"><i></i></button></div>
+        <div class="set-row" data-feat="exitConfirm"><span><span data-i18n="set.exitConfirm"></span><small class="fine" id="exit-hint"></small></span>
+          <button type="button" class="switch" role="switch" data-key="exitConfirm" data-member data-i18n-attr="aria-label:set.exitConfirm" aria-label="Exit confirmation"><i></i></button></div>
+      </section>
+
+      <section class="set-sec">
+        <h3 data-i18n="set.about"></h3>
+        <div id="app-ver" class="app-ver"></div>
+        <div class="set-btns">
+          <button type="button" class="btn ghost sm" id="btn-update" data-member data-i18n="upd.check"></button>
+          <button type="button" class="btn ghost sm" id="btn-shareapp" data-member data-i18n="app.share"></button>
+          <button type="button" class="btn ghost sm" id="btn-rate" data-member data-i18n="app.rate"></button>
+        </div>
+        <div id="upd-msg" class="upd" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="set-sec">
         <h3 data-i18n="set.account"></h3>
         <p class="fine" id="set-acct"></p>
         <button type="button" class="btn ghost sm" id="set-acct-btn"></button>
       </section>
 
-      <section class="set-sec">
+      <section class="set-sec dl-section"${isAndroidApp() ? ' hidden' : ''}>
         <h3 data-i18n="set.app"></h3>
         <p class="fine" data-i18n="set.app.lede"></p>
         <ul class="dl-list">
@@ -397,8 +428,21 @@ function buildSettingsDialog() {
   }));
   $$('.switch', d).forEach((b) => b.addEventListener('click', () => {
     const key = b.dataset.key;
-    requireMember(t(`gate.${key}`), () => updateSetting(key, !getSettings()[key]));
+    requireMember(t(`gate.${key}`), async () => {
+      const next = !getSettings()[key];
+      if (key === 'fullscreen') {
+        const ok = await setFullscreen(next); // di website harus dipanggil dari klik pengguna
+        if (next && !ok) { toast(t('set.fsFail')); return; }
+      }
+      updateSetting(key, next);
+    });
   }));
+  $('#btn-update', d).addEventListener('click', () => requireMember(t('gate.update'), runUpdateCheck));
+  $('#btn-shareapp', d).addEventListener('click', () => requireMember(t('gate.shareApp'), async () => {
+    const r = await shareApp();
+    if (r === 'copied') toast(t('app.share.copied')); else if (r === 'fail') toast(t('app.share.fail'));
+  }));
+  $('#btn-rate', d).addEventListener('click', () => requireMember(t('gate.rateApp'), () => rateApp()));
   $('#set-acct-btn', d).addEventListener('click', () => {
     if (member) { logout(); closeDialog(d); } else { closeDialog(d); openAuth({ reason: false, mode: 'login' }); }
   });
@@ -414,6 +458,42 @@ export function updateSetting(key, value) {
   saveSettings(next, isManual() ? getLang() : null).then(() => toast(t('set.saved'))).catch(() => toast(t('set.saveFail')));
 }
 
+async function runUpdateCheck() {
+  const box = $('#upd-msg');
+  if (!box) return;
+  box.innerHTML = `<p class="fine">${t('upd.checking')}</p>`;
+  const r = await checkForUpdate();
+  if (!r.ok) { box.innerHTML = `<p class="fine bad">${t('upd.fail')}</p>`; return; }
+  const parts = [];
+  if (r.web.isNew) {
+    parts.push(`<p>${t('upd.webNew', { v: r.web.latest })}</p><button type="button" class="btn sm" id="upd-reload">${t('upd.reload')}</button>`);
+  } else {
+    parts.push(`<p class="ok">${t('upd.webOk', { v: r.web.current })}</p>`);
+  }
+  if (r.app) {
+    if (r.app.isNew) {
+      parts.push(`<p>${t('upd.appNew', { v: r.app.latest, cur: r.app.installed })}</p>
+        <div class="set-btns"><a class="btn sm" href="${r.app.apk}" download>${t('upd.apk')}</a>
+        <button type="button" class="btn ghost sm" id="upd-itch">${t('upd.itch')}</button></div>`);
+    } else {
+      parts.push(`<p class="ok">${t('upd.appOk', { v: r.app.installed })}</p>`);
+    }
+  }
+  box.innerHTML = parts.join('');
+  const rl = $('#upd-reload', box); if (rl) rl.addEventListener('click', reloadForUpdate);
+  const it = $('#upd-itch', box); if (it) it.addEventListener('click', () => openExternal(ITCH_URL));
+  haptic(r.web.isNew || (r.app && r.app.isNew) ? 'done' : 'tap');
+}
+
+function paintAppInfo(d) {
+  const box = $('#app-ver', d);
+  if (!box) return;
+  if (!member) { box.innerHTML = `<p class="fine">${t('app.ver.guest')}</p>`; return; }
+  const nat = nativeInfo();
+  box.innerHTML = `<dl class="kv"><div><dt>${t('app.ver.web')}</dt><dd>${WEB_VERSION}</dd></div>` +
+    (nat ? `<div><dt>${t('app.ver.android')}</dt><dd>${nat.versionName} (${nat.versionCode})</dd></div>` : '') + '</dl>';
+}
+
 function paintSettings() {
   const d = $('#dlg-settings');
   if (!d) return;
@@ -424,6 +504,11 @@ function paintSettings() {
   $('#set-acct', d).textContent = member && user ? t('set.signedAs', { email: user.email }) : t('set.guest');
   $('#set-acct-btn', d).textContent = member ? t('set.logout') : t('auth.cta');
   $('#apk-meta', d).textContent = t('set.apk.meta', { size: (APK_BYTES / 1048576).toLocaleString(locale(), { maximumFractionDigits: 1 }) + ' MB' });
+  const showFeat = { haptics: isAndroidApp() || !!navigator.vibrate, keepAwake: isAndroidApp() || 'wakeLock' in navigator, fullscreen: fullscreenSupported(), exitConfirm: true };
+  $$('[data-feat]', d).forEach((r) => { r.hidden = !showFeat[r.dataset.feat]; });
+  $('#exit-hint', d).textContent = t(isAndroidApp() ? 'set.exitHintApp' : 'set.exitHintWeb');
+  paintAppInfo(d);
+  refreshExitLabels();
   refreshLocks();
 }
 
@@ -447,6 +532,12 @@ export function initShell() {
   refreshLocks();
   onLangChange(() => { paintHeader(); paintAuth(); paintSettings(); });
   setupPwa();
+  onSettingsChange((st) => setDeviceState({ settings: st }));
+  onFullscreenExit(() => { if (member && getSettings().fullscreen && !isAndroidApp()) updateSetting('fullscreen', false); });
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('button, .btn, [role="switch"], [role="tab"], .go')) haptic('tap');
+  }, { passive: true });
+  setDeviceState({ member: false, settings: getSettings() });
   if (mayHaveSession()) ensureAuthStarted().catch(() => {});
   // Keadaan awal Guest: pastikan pengaturan personal memakai bawaan sampai sesi terbukti ada.
   if (!mayHaveSession()) resetToGuest();

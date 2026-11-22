@@ -15,6 +15,7 @@
   <script>
     /* Terapkan tema Member yang tersimpan sebelum render pertama (hanya jika ada sesi login), agar tidak berkedip. */
     (function () {
+      if (window.RLCNative) document.documentElement.dataset.app = 'android';
       try {
         var s = JSON.parse(localStorage.getItem('pingtest-rlc:settings:v1') || 'null');
         var has = false;
@@ -24,7 +25,9 @@
         }
         if (s && s.settings && has) {
           var d = document.documentElement;
-          d.dataset.theme = s.settings.theme === 'light' ? 'light' : 'dark';
+          var m = s.settings.theme, dark = !(window.matchMedia && !matchMedia('(prefers-color-scheme: dark)').matches);
+          d.dataset.theme = m === 'light' ? 'light' : m === 'system' ? (dark ? 'dark' : 'light') : 'dark';
+          d.dataset.themeMode = m === 'light' || m === 'system' ? m : 'dark';
           d.dataset.glass = s.settings.glass ? 'on' : 'off';
           d.dataset.motion = s.settings.motion === false ? 'off' : 'on';
         }
@@ -203,6 +206,12 @@
               <p class="fine" id="bloat-desc"></p>
             </div>
           </div>
+        </article>
+
+        <article class="panel wide insight" id="insight" aria-labelledby="h-insight">
+          <h3 id="h-insight" data-i18n="ins.h">Analisis hasil</h3>
+          <p class="fine" id="ins-lede" data-i18n="ins.lede">Perkiraan kelayakan penggunaan, saran, dan perbandingan dengan tes sebelumnya, dihitung dari hasil tes Anda.</p>
+          <div id="ins-body"></div>
         </article>
 
         <article class="panel wide" aria-labelledby="h-chart">
