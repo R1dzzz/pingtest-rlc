@@ -20,7 +20,7 @@ import {
   openDialog, closeDialog, wireDialog, refreshLocks,
 } from './shell.js';
 import { listResults, insertResult, insertMany, deleteResult, deleteAllResults } from './cloud.js';
-import { renderShareImage, canWebShareFiles, canCopyImage } from './share.js';
+import { renderShareImage, renderHistoryImage, historyStats, canWebShareFiles, canCopyImage } from './share.js';
 
 initShell();
 
@@ -371,19 +371,8 @@ $('#exp-json').addEventListener('click', () => requireMember(t('gate.export'), (
 $('#his-share').addEventListener('click', () => requireMember(t('gate.shareHis'), async () => {
   const list = await fullHistory();
   if (!list) return;
-  const name = `pingtest-rlc-${stamp()}.csv`;
-  const file = new File([toCSV(list)], name, { type: 'text/csv' });
-  if (canWebShareFiles(file)) {
-    try {
-      await navigator.share({ files: [file], title: 'PingTest by RLC' });
-      toast(t('his.shared'));
-    } catch (e) {
-      if (e && e.name !== 'AbortError') { downloadText(name, toCSV(list), 'text/csv;charset=utf-8'); toast(t('his.sharedFallback')); }
-    }
-  } else {
-    downloadText(name, toCSV(list), 'text/csv;charset=utf-8');
-    toast(t('his.sharedFallback'));
-  }
+  if (!list.length) { toast(t('his.empty')); return; }
+  openHistoryShare(list);
 }));
 
 /* ---------- Bagikan hasil sebagai PNG ---------- */
@@ -411,16 +400,34 @@ function buildShareDialog() {
 }
 
 async function openShare(entry) {
+  return openImageShare({
+    render: () => renderShareImage(entry), titleKey: 'share.title', altKey: 'share.alt', stampName: 'result',
+    text: () => t('share.text', { down: speedText(entry.download), up: speedText(entry.upload), lat: msText(entry.latency), jit: msText(entry.jitter) }),
+  });
+}
+
+async function openHistoryShare(list) {
+  const st = historyStats(list);
+  return openImageShare({
+    render: () => renderHistoryImage(list), titleKey: 'share.histTitle', altKey: 'share.histAlt', stampName: 'history',
+    text: () => t('share.histText', { n: st.n, down: speedText(st.down), up: speedText(st.up), lat: msText(st.lat) }),
+  });
+}
+
+async function openImageShare({ render, titleKey, altKey, stampName, text }) {
   const d = $('#dlg-share') || buildShareDialog();
   const msg = $('#share-msg', d);
   const img = $('#share-img', d);
+  const title = $('#share-title', d);
+  title.setAttribute('data-i18n', titleKey);
+  title.textContent = t(titleKey);
   msg.textContent = '';
-  img.alt = t('share.alt');
+  img.alt = t(altKey);
   img.removeAttribute('src');
   openDialog(d);
   let blob;
   try {
-    blob = await renderShareImage(entry);
+    blob = await render();
   } catch {
     msg.textContent = t('share.fail');
     return;
@@ -428,7 +435,7 @@ async function openShare(entry) {
   if (shareUrl) URL.revokeObjectURL(shareUrl);
   shareUrl = URL.createObjectURL(blob);
   img.src = shareUrl;
-  const fname = `pingtest-rlc-${stamp()}.png`;
+  const fname = `pingtest-rlc-${stampName}-${stamp()}.png`;
   const file = new File([blob], fname, { type: 'image/png' });
   const native = $('#sh-native', d);
   const copy = $('#sh-copy', d);
@@ -436,10 +443,7 @@ async function openShare(entry) {
   copy.hidden = !canCopyImage();
   native.onclick = async () => {
     try {
-      await navigator.share({
-        files: [file], title: 'PingTest by RLC',
-        text: t('share.text', { down: speedText(entry.download), up: speedText(entry.upload), lat: msText(entry.latency), jit: msText(entry.jitter) }),
-      });
+      await navigator.share({ files: [file], title: 'PingTest by RLC', text: text() });
       msg.textContent = t('share.sharedOk');
     } catch (e) { if (e && e.name !== 'AbortError') msg.textContent = t('share.fail'); }
   };

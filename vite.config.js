@@ -20,7 +20,7 @@ const STATIC_FILES = [
   'favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png',
   'icon-maskable-512.png', 'og-image.png', 'manifest.webmanifest', 'logo.svg',
   'brand-claude.svg', 'brand-chatgpt.svg', 'brand-grok.svg', 'brand-kimi.svg',
-  'logo-smk-tamtama.webp', 'logo-lpks-x-japan.webp', 'offline.html',
+  'logo-smk-tamtama.webp', 'logo-lpks-x-japan.webp', 'offline.html', 'brand-itchio.svg', 'PingTest-by-RLC-Studio.apk',
 ];
 
 function rlcSite() {

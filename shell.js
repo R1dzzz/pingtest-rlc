@@ -1,6 +1,7 @@
 // Kerangka bersama semua halaman: bahasa, Pusat Pengaturan, login/daftar, Guest vs Member,
 // aksi tertunda (dilanjutkan otomatis setelah login), pemasangan PWA, dan Service Worker.
-import { t, initLang, setLang, getLang, onLangChange, applyDom, isManual } from './i18n.js';
+import { APK_URL, APK_BYTES, ITCH_URL } from './site.config.js';
+import { t, locale, initLang, setLang, getLang, onLangChange, applyDom, isManual } from './i18n.js';
 import { applySettings, resetToGuest, cacheSettings, getSettings, DEFAULTS } from './settings.js';
 import { setSoundEnabled } from './sound.js';
 import {
@@ -17,7 +18,6 @@ let user = null;
 let pending = null;
 let authStarted = null;
 let busyCheck = () => false;
-let installEvent = null;
 const authListeners = new Set();
 let authMode = 'login';
 let authReason = false;
@@ -367,8 +367,20 @@ function buildSettingsDialog() {
 
       <section class="set-sec">
         <h3 data-i18n="set.app"></h3>
-        <button type="button" class="btn ghost sm" id="set-install" hidden data-i18n="set.install"></button>
-        <p class="fine" id="set-install-note"></p>
+        <p class="fine" data-i18n="set.app.lede"></p>
+        <ul class="dl-list">
+          <li><a class="dl-item" href="${ITCH_URL}" target="_blank" rel="noopener noreferrer">
+            <span class="dl-ico"><img src="/brand-itchio.svg" alt="" width="28" height="28"></span>
+            <span class="dl-txt"><b data-i18n="set.itch"></b><small data-i18n="set.itch.sub"></small></span></a></li>
+          <li><div class="dl-item off" role="group" aria-disabled="true">
+            <span class="dl-ico dl-ico-text" aria-hidden="true">APK</span>
+            <span class="dl-txt"><b data-i18n="set.apkpure"></b><small data-i18n="set.apkpure.sub"></small></span>
+            <span class="dl-badge" data-i18n="set.soon"></span></div></li>
+          <li><a class="dl-item primary" href="${APK_URL}" download>
+            <span class="dl-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 20h16"/></svg></span>
+            <span class="dl-txt"><b data-i18n="set.apk"></b><small id="apk-meta"></small></span></a></li>
+        </ul>
+        <p class="fine" data-i18n="set.apk.note"></p>
         <p class="fine" data-i18n="set.needsNet"></p>
       </section>
     </div>`;
@@ -389,13 +401,6 @@ function buildSettingsDialog() {
   }));
   $('#set-acct-btn', d).addEventListener('click', () => {
     if (member) { logout(); closeDialog(d); } else { closeDialog(d); openAuth({ reason: false, mode: 'login' }); }
-  });
-  $('#set-install', d).addEventListener('click', async () => {
-    if (!installEvent) return;
-    installEvent.prompt();
-    try { await installEvent.userChoice; } catch { /* abaikan */ }
-    installEvent = null;
-    paintSettings();
   });
   return d;
 }
@@ -418,9 +423,7 @@ function paintSettings() {
   $$('.switch', d).forEach((b) => b.setAttribute('aria-checked', String(!!s[b.dataset.key])));
   $('#set-acct', d).textContent = member && user ? t('set.signedAs', { email: user.email }) : t('set.guest');
   $('#set-acct-btn', d).textContent = member ? t('set.logout') : t('auth.cta');
-  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  $('#set-install', d).hidden = !installEvent || standalone;
-  $('#set-install-note', d).textContent = standalone ? t('set.installed') : installEvent ? '' : t('set.installNA');
+  $('#apk-meta', d).textContent = t('set.apk.meta', { size: (APK_BYTES / 1048576).toLocaleString(locale(), { maximumFractionDigits: 1 }) + ' MB' });
   refreshLocks();
 }
 
@@ -432,8 +435,6 @@ export function openSettings() {
 
 /* ---------- PWA ---------- */
 function setupPwa() {
-  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; paintSettings(); });
-  window.addEventListener('appinstalled', () => { installEvent = null; paintSettings(); });
   if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => {}); });
   }

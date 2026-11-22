@@ -53,6 +53,23 @@
           "value": "noindex"
         }
       ]
+    },
+    {
+      "source": "/PingTest-by-RLC-Studio.apk",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/vnd.android.package-archive"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "attachment; filename=\"PingTest-by-RLC-Studio.apk\""
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     }
   ]
 }

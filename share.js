@@ -120,5 +120,99 @@ export async function renderShareImage(entry) {
   return blob;
 }
 
+
+const avg = (arr) => { const v = arr.filter(isNum); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+
+/** Ringkasan nyata dari daftar riwayat (rata-rata hanya dari nilai yang benar-benar terukur). */
+export function historyStats(list) {
+  return { n: list.length, down: avg(list.map((e) => e.download)), up: avg(list.map((e) => e.upload)), lat: avg(list.map((e) => e.latency)) };
+}
+
+const ROWS = 10;
+const shortDate = (iso) => new Date(iso).toLocaleString(locale(), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+/** Gambar PNG riwayat: ringkasan + 10 hasil terbaru. list = riwayat (terbaru dulu). */
+export async function renderHistoryImage(list) {
+  await ensureFonts();
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+  ctx.textBaseline = 'alphabetic';
+
+  try {
+    const logo = await loadImage('/logo.svg');
+    const lh = 84; const lw = (logo.naturalWidth / logo.naturalHeight) * lh;
+    ctx.drawImage(logo, 72, 72, lw, lh);
+  } catch { /* logo opsional */ }
+  const tx = 72 + 84 * 0.62 + 28;
+  ctx.fillStyle = C.text; ctx.font = `650 52px ${SANS}`; ctx.textAlign = 'left';
+  ctx.fillText('PingTest by RLC', tx, 118);
+  ctx.fillStyle = C.dl; ctx.font = `600 22px ${MONO}`;
+  spaced(ctx, t('his.h').toUpperCase(), tx, 154, 4);
+
+  // Kartu ringkasan
+  const st = historyStats(list);
+  const cw = (W - 144 - 3 * 16) / 4;
+  const cards = [
+    [t('hs.tests'), String(st.n), C.text],
+    [t('hs.avgDown'), speedText(st.down), C.dl],
+    [t('hs.avgUp'), speedText(st.up), C.ul],
+    [t('hs.avgLat'), msText(st.lat), C.text, isNum(st.lat) ? 'ms' : ''],
+  ];
+  cards.forEach(([label, val, color, unit], i) => {
+    const x = 72 + i * (cw + 16);
+    ctx.fillStyle = C.panel; chamfer(ctx, x, 212, cw, 170, 24); ctx.fill();
+    ctx.textAlign = 'left'; ctx.fillStyle = C.muted; ctx.font = `600 17px ${MONO}`;
+    spaced(ctx, label, x + 22, 256, 2);
+    ctx.fillStyle = color; ctx.font = `600 52px ${MONO}`;
+    ctx.fillText(val, x + 20, 340);
+    if (unit) {
+      const w = ctx.measureText(val).width;
+      ctx.fillStyle = C.muted; ctx.font = `500 24px ${MONO}`;
+      ctx.fillText(unit, x + 20 + w + 8, 340);
+    }
+  });
+
+  // Tabel
+  const shown = list.slice(0, ROWS);
+  ctx.fillStyle = C.muted; ctx.font = `600 18px ${MONO}`;
+  const cols = { date: 72, down: 640, up: 775, lat: 895, jit: 1008 };
+  ctx.textAlign = 'left'; spaced(ctx, t('hs.date'), cols.date, 440, 3);
+  ctx.textAlign = 'right';
+  [['down', '↓ MBPS'], ['up', '↑ MBPS'], ['lat', 'LAT MS'], ['jit', 'JIT MS']].forEach(([k, l]) => spaced(ctx, l, cols[k], 440, 1, 'right'));
+  ctx.fillStyle = C.line; ctx.fillRect(72, 458, W - 144, 2);
+  const rowH = 74;
+  shown.forEach((e, i) => {
+    const y = 460 + i * rowH;
+    if (i % 2 === 1) { ctx.fillStyle = C.panel; ctx.fillRect(72, y, W - 144, rowH); }
+    const base = y + 47;
+    ctx.textAlign = 'left'; ctx.fillStyle = C.text; ctx.font = `500 24px ${MONO}`;
+    ctx.fillText(shortDate(e.ts), cols.date + 10, base);
+    ctx.textAlign = 'right';
+    ctx.font = `600 28px ${MONO}`;
+    ctx.fillStyle = C.dl; ctx.fillText(speedText(e.download), cols.down, base);
+    ctx.fillStyle = C.ul; ctx.fillText(speedText(e.upload), cols.up, base);
+    ctx.fillStyle = C.text; ctx.fillText(msText(e.latency), cols.lat, base);
+    ctx.fillStyle = C.muted; ctx.fillText(msText(e.jitter), cols.jit, base);
+  });
+  if (!shown.length) {
+    ctx.fillStyle = C.muted; ctx.font = `500 28px ${MONO}`; ctx.textAlign = 'left';
+    ctx.fillText('—', 82, 520);
+  }
+  ctx.textAlign = 'left'; ctx.fillStyle = C.faint; ctx.font = `500 22px ${MONO}`;
+  ctx.fillText(t('hs.recent', { shown: shown.length, n: list.length }), 72, 1240);
+
+  ctx.fillStyle = C.line; ctx.fillRect(72, 1262, W - 144, 2);
+  ctx.fillStyle = C.faint; ctx.font = `500 22px ${MONO}`;
+  ctx.fillText(t('card.measured'), 72, 1304);
+  ctx.textAlign = 'right'; ctx.fillStyle = C.muted;
+  ctx.fillText(location.host, W - 72, 1304);
+
+  const blob = await new Promise((res) => cv.toBlob(res, 'image/png'));
+  if (!blob) throw new Error('toBlob');
+  return blob;
+}
+
 export const canWebShareFiles = (file) => !!(navigator.canShare && navigator.share && navigator.canShare({ files: [file] }));
 export const canCopyImage = () => !!(navigator.clipboard && window.ClipboardItem && navigator.clipboard.write);
