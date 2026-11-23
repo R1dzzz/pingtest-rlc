@@ -82,34 +82,6 @@ supabase-migration-v2.sql   Migrasi kolom prefs
 PingTest-by-RLC-Studio.apk  Aplikasi Android v2.0.0
 ```
 
-## Menjalankan
-
-```bash
-npm install
-npm run dev        # pengembangan
-npm run build      # produksi -> dist/
-npm run preview
-```
-
-Butuh Node 20.19 atau lebih baru.
-
-## Deploy
-
-1. Unggah semua berkas ke GitHub (root repo).
-2. Vercel → **Add New → Project** → pilih repo. Build Command `npm run build`, Output Directory `dist`.
-3. Opsional (fitur Member): isi **Environment Variables** `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY` (kunci anon/publishable, bukan `service_role`), lalu Redeploy. Tanpa ini situs berjalan sebagai Guest.
-4. Domain kustom: tambahkan `SITE_URL` di Vercel.
-
-## Supabase
-
-1. Buat project, jalankan `supabase-schema.sql` di **SQL Editor** (jalankan juga `supabase-migration-v2.sql` bila skema lama).
-2. **Authentication → URL Configuration**: isi Site URL dan Redirect URLs dengan domain situs.
-3. Status "landing sudah dilihat" disimpan di kolom `prefs` (jsonb) tabel `user_settings`.
-
-## Aplikasi Android
-
-APK tersedia di [`/download`](https://pingtest-rlc.vercel.app/download) dan di [itch.io](https://f-alfiyansah.itch.io/pingtest-by-rlc). Setelah merilis APK baru, perbarui `ANDROID_LATEST` di `site.config.js`; ukuran dan SHA-256 dihitung otomatis saat build. Versi 2.0.0 memakai kunci penandatanganan baru, jadi hapus instalasi versi 1.x terlebih dahulu. Jangan pernah mengunggah berkas keystore (`*.jks`) ke GitHub.
-
 ## Developer
 
 **Farid Alfiyansah** — [@r1dzzz](https://github.com/r1dzzz) · Rogue Logic Creations (RLC) · SMK Tamtama Karanganyar, TJKT.
