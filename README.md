@@ -62,25 +62,6 @@ Dikembangkan oleh **Rogue Logic Creations (RLC)** dari ide **Farid Alfiyansah**,
 
 Vite 8 (multi-page) · JavaScript murni · `@cloudflare/speedtest` · Supabase (Auth + Postgres) · Vercel · Service Worker.
 
-## Struktur (datar, tanpa folder)
-
-Semua berkas berada di root repo agar bisa diunggah dari browser HP.
-
-```
-index.html / main.js        Halaman utama (tes, diagnostik, riwayat)
-about.html / about.js       Halaman Tentang
-download.html / download.js Halaman Download APK
-welcome.js                  Landing pertama + popup unduhan
-shell.js                    Header, akun, pengaturan, pemeriksa pembaruan
-settings.js / cloud.js      Pengaturan + sinkronisasi Supabase
-i18n.js                     Teks Indonesia / English
-engine.js gauge.js charts.js history.js netinfo.js insight.js share.js util.js
-site.config.js              APK_URL, versi Android terbaru, tautan itch.io
-vite.config.js              Build, sitemap, robots, version.json, SHA-256 APK
-supabase-schema.sql         Skema awal
-supabase-migration-v2.sql   Migrasi kolom prefs
-PingTest-by-RLC-Studio.apk  Aplikasi Android v2.0.0
-```
 
 ## Developer
 
