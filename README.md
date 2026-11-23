@@ -1,104 +1,121 @@
-# PingTest by RLC
+<div align="center">
 
-Website tes kecepatan & kualitas internet (download, upload, HTTP latency, jitter, estimasi bufferbloat).
-Frontend-only (Vite + JavaScript), memakai mesin ukur resmi [`@cloudflare/speedtest`](https://github.com/cloudflare/speedtest) (MIT).
+<img src="readme-banner.svg" alt="PingTest by RLC" width="100%">
 
-- Developer: Rogue Logic Creations (RLC)
-- Ide: Farid Alfiyansah — SMK Tamtama Karanganyar, TJKT
-- Build command: `npm run build` · Output directory: `dist`
+<img src="readme-typing.svg" alt="ping --real --no-simulation" height="44">
 
-## Struktur file (datar, tanpa folder)
+<p>
+  <a href="https://pingtest-rlc.vercel.app"><img alt="Live" src="https://img.shields.io/badge/LIVE-pingtest--rlc.vercel.app-c6f432?style=for-the-badge&labelColor=0d0f11"></a>
+  <a href="https://pingtest-rlc.vercel.app/download"><img alt="Download APK" src="https://img.shields.io/badge/ANDROID-Download%20APK-3ddc84?style=for-the-badge&logo=android&logoColor=white&labelColor=0d0f11"></a>
+</p>
 
-Semua file ada di root repo supaya bisa diunggah sekaligus dari browser HP.
+<p>
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white">
+  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES2020-F7DF1E?style=flat-square&logo=javascript&logoColor=black">
+  <img alt="Cloudflare" src="https://img.shields.io/badge/Cloudflare-speedtest-F38020?style=flat-square&logo=cloudflare&logoColor=white">
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-Auth%20%2B%20DB-3FCF8E?style=flat-square&logo=supabase&logoColor=white">
+  <img alt="Vercel" src="https://img.shields.io/badge/Vercel-Deploy-000000?style=flat-square&logo=vercel&logoColor=white">
+  <img alt="PWA" src="https://img.shields.io/badge/PWA-Offline%20shell-5A0FC8?style=flat-square&logo=pwa&logoColor=white">
+  <img alt="Android" src="https://img.shields.io/badge/Android-APK%20v2.0.0-3DDC84?style=flat-square&logo=android&logoColor=white">
+  <img alt="i18n" src="https://img.shields.io/badge/i18n-ID%20%7C%20EN-c6f432?style=flat-square">
+  <img alt="Tema" src="https://img.shields.io/badge/Theme-Dark%20%7C%20Light-9097a0?style=flat-square">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=flat-square">
+</p>
+
+<img src="readme-rlc-badge.svg" alt="RLC Repository of the Month" width="320">
+
+<sub>Lencana di atas hanyalah elemen dekoratif gaya RLC. Ini <b>bukan</b> penghargaan resmi dari GitHub maupun pihak mana pun.</sub>
+
+</div>
+
+---
+
+## Tentang
+
+**PingTest by RLC** adalah website tes kecepatan dan kualitas internet: download, upload, latency, jitter, dan estimasi bufferbloat, diukur langsung dari browser ke jaringan Cloudflare memakai mesin resmi [`@cloudflare/speedtest`](https://github.com/cloudflare/speedtest) (MIT). Setiap angka berasal dari pengukuran nyata, bukan simulasi.
+
+Dikembangkan oleh **Rogue Logic Creations (RLC)** dari ide **Farid Alfiyansah**, siswa TJKT SMK Tamtama Karanganyar.
+
+## Tampilan
+
+<div align="center">
+  <img src="readme-preview-desktop.png" alt="Halaman utama (desktop)" width="62%">
+  <img src="readme-preview-welcome.png" alt="Landing pertama (mobile)" width="17%">
+  <img src="readme-preview-download.png" alt="Halaman Download (mobile)" width="17%">
+</div>
+
+## Fitur
+
+| | |
+|---|---|
+| **Tes nyata** | Download, upload, latency, jitter, estimasi bufferbloat; profil *Hemat data* dan *Standar*. |
+| **Diagnostik RLC** | Kelayakan streaming, video call, game, dan cloud, lengkap dengan saran dan perbandingan dengan tes sebelumnya. |
+| **Riwayat** | Tersimpan di perangkat (Guest) atau di akun (Member); ekspor CSV/JSON dan bagikan sebagai gambar. |
+| **Akun Member** | Supabase Auth + RLS: setiap akun hanya bisa membaca datanya sendiri. Pengaturan tersinkron lintas perangkat. |
+| **Landing pertama** | Ditampilkan sekali per akun (lintas perangkat); Guest sekali per perangkat. |
+| **Download APK** | Popup gaya notifikasi iOS dan halaman `/download` mengunduh APK langsung dari website, lengkap dengan SHA-256 yang dihitung saat build. |
+| **Dwibahasa & tema** | Indonesia / English, Gelap / Terang / Sistem, mode Glass dan animasi. |
+| **PWA** | Dapat dipasang dari Chrome; service worker hanya menyimpan berkas statis publik. |
+| **Privasi** | Tanpa cookie pelacak dan tanpa analytics. |
+
+## Teknologi
+
+Vite 8 (multi-page) · JavaScript murni · `@cloudflare/speedtest` · Supabase (Auth + Postgres) · Vercel · Service Worker.
+
+## Struktur (datar, tanpa folder)
+
+Semua berkas berada di root repo agar bisa diunggah dari browser HP.
 
 ```
-pingtest-by-rlc/
-├── index.html              Halaman utama (tes, diagnostik, riwayat, penjelasan)
-├── about.html              Halaman Tentang (Disusun oleh + My AI Team)
-├── main.js                 Logika halaman utama
-├── about.js                Avatar GitHub (dengan placeholder jika gagal)
-├── engine.js               Pembungkus @cloudflare/speedtest + profil tes
-├── gauge.js                Speedometer SVG
-├── charts.js               Grafik garis SVG
-├── history.js              Riwayat LocalStorage + ekspor CSV/JSON
-├── netinfo.js              Info koneksi browser (Network Information API)
-├── util.js                 Fungsi bantu + estimasi bufferbloat
-├── site.config.js          Pengaturan (mis. kirim hasil ke Cloudflare)
-├── styles.css              Seluruh gaya
-├── vite.config.js          Konfigurasi Vite (+ sitemap, robots, URL situs)
-├── vercel.json             URL bersih (/about) + header keamanan
-├── package.json            Dependensi
-├── package-lock.json       Versi terkunci
-├── manifest.webmanifest    Web manifest
-├── logo.svg                Logo RLC (vektor dari logo Anda)
-├── favicon.svg / favicon.ico / apple-touch-icon.png
-├── icon-192.png / icon-512.png / icon-maskable-512.png
-├── og-image.png            Gambar pratinjau (Open Graph / Twitter)
-└── brand-claude.svg, brand-chatgpt.svg, brand-grok.svg, brand-kimi.svg
+index.html / main.js        Halaman utama (tes, diagnostik, riwayat)
+about.html / about.js       Halaman Tentang
+download.html / download.js Halaman Download APK
+welcome.js                  Landing pertama + popup unduhan
+shell.js                    Header, akun, pengaturan, pemeriksa pembaruan
+settings.js / cloud.js      Pengaturan + sinkronisasi Supabase
+i18n.js                     Teks Indonesia / English
+engine.js gauge.js charts.js history.js netinfo.js insight.js share.js util.js
+site.config.js              APK_URL, versi Android terbaru, tautan itch.io
+vite.config.js              Build, sitemap, robots, version.json, SHA-256 APK
+supabase-schema.sql         Skema awal
+supabase-migration-v2.sql   Migrasi kolom prefs
+PingTest-by-RLC-Studio.apk  Aplikasi Android v2.0.0
 ```
 
-`sitemap.xml` dan `robots.txt` dibuat otomatis saat build (ada di `dist/`).
+## Menjalankan
 
-## Upload ke GitHub lewat HP Android (tanpa terminal)
+```bash
+npm install
+npm run dev        # pengembangan
+npm run build      # produksi -> dist/
+npm run preview
+```
 
-1. Ekstrak `pingtest-by-rlc.zip` (aplikasi **Files by Google** → ketuk file zip → **Ekstrak**).
-2. Buka **github.com** di Chrome, login, lalu buka **github.com/new**.
-   - Repository name: `pingtest-by-rlc`
-   - Pilih Public atau Private (keduanya bisa di-deploy Vercel), jangan centang "Add a README".
-   - Ketuk **Create repository**.
-3. Di halaman repo kosong, ketuk tautan **uploading an existing file**.
-4. Ketuk **choose your files**, buka folder hasil ekstrak, **pilih semua file** (ketuk lama lalu "Pilih semua"), lalu ketuk Buka/Pilih.
-   - Jika Chrome HP memakai tampilan mobile dan tombol tidak muncul, aktifkan **Situs desktop** di menu ⋮ Chrome.
-   - Pastikan semua file berada di **root** (tidak ada folder), termasuk `package.json`.
-5. Tunggu semua file selesai terunggah, isi pesan commit (mis. `Initial commit`), ketuk **Commit changes**.
+Butuh Node 20.19 atau lebih baru.
 
-## Deploy ke Vercel lewat HP
+## Deploy
 
-1. Buka **vercel.com**, login dengan **Continue with GitHub**.
-2. Ketuk **Add New… → Project**, pilih repo `pingtest-by-rlc` → **Import** (beri izin akses GitHub jika diminta).
-3. Framework Preset akan terdeteksi **Vite**. Pastikan:
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-4. Ketuk **Deploy**, tunggu 1–2 menit sampai muncul "Congratulations".
+1. Unggah semua berkas ke GitHub (root repo).
+2. Vercel → **Add New → Project** → pilih repo. Build Command `npm run build`, Output Directory `dist`.
+3. Opsional (fitur Member): isi **Environment Variables** `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY` (kunci anon/publishable, bukan `service_role`), lalu Redeploy. Tanpa ini situs berjalan sebagai Guest.
+4. Domain kustom: tambahkan `SITE_URL` di Vercel.
 
-### Cara memeriksa hasilnya
+## Supabase
 
-- Buka URL Vercel Anda, tekan **MULAI**, tunggu tes selesai. Pastikan angka download/upload/latency muncul.
-- Buka `/about`, `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest`.
-- Tes lagi lalu cek bagian **Riwayat**; coba **Ekspor CSV/JSON**.
-- Jika Vercel memberi domain selain `pingtest-by-rlc.vercel.app`, build otomatis memakai domain produksi Vercel untuk canonical/sitemap. Untuk domain kustom, tambahkan Environment Variable `SITE_URL` (mis. `https://namadomain.com`) di Vercel → Settings → Environment Variables, lalu **Redeploy**.
+1. Buat project, jalankan `supabase-schema.sql` di **SQL Editor** (jalankan juga `supabase-migration-v2.sql` bila skema lama).
+2. **Authentication → URL Configuration**: isi Site URL dan Redirect URLs dengan domain situs.
+3. Status "landing sudah dilihat" disimpan di kolom `prefs` (jsonb) tabel `user_settings`.
 
-## SEO: langkah setelah online
+## Aplikasi Android
 
-1. Buka **search.google.com/search-console**, tambahkan URL situs Anda (jenis "URL prefix").
-2. Kirim `https://DOMAIN-ANDA/sitemap.xml` di menu **Sitemaps**.
-3. Pakai **URL Inspection → Request indexing** untuk `/` dan `/about`.
+APK tersedia di [`/download`](https://pingtest-rlc.vercel.app/download) dan di [itch.io](https://f-alfiyansah.itch.io/pingtest-by-rlc). Setelah merilis APK baru, perbarui `ANDROID_LATEST` di `site.config.js`; ukuran dan SHA-256 dihitung otomatis saat build. Versi 2.0.0 memakai kunci penandatanganan baru, jadi hapus instalasi versi 1.x terlebih dahulu. Jangan pernah mengunggah berkas keystore (`*.jks`) ke GitHub.
 
-Indexing Google butuh waktu (hari hingga minggu); tidak ada yang bisa menjamin peringkat tertentu.
+## Developer
 
-## Mengubah sesuatu
+**Farid Alfiyansah** — [@r1dzzz](https://github.com/r1dzzz) · Rogue Logic Creations (RLC) · SMK Tamtama Karanganyar, TJKT.
 
-Lewat GitHub di HP: buka file → ikon pensil ✏️ → ubah → **Commit changes**. Vercel otomatis deploy ulang.
+## Lisensi
 
-- Teks halaman Tentang: `about.html`
-- Matikan pengiriman hasil ke Cloudflare: `site.config.js` → `SEND_RESULTS_TO_CLOUDFLARE = false`
-- Warna: variabel di bagian atas `styles.css`
+Kode situs: lihat [LICENSE](LICENSE). `@cloudflare/speedtest` berlisensi MIT. Nama dan logo Claude, ChatGPT, Grok, Kimi, serta logo sekolah dan LPKS X Japan adalah milik masing-masing pemiliknya dan hanya dipakai untuk identifikasi.
 
-## Catatan teknis & kejujuran pengukuran
-
-- Semua angka berasal dari `@cloudflare/speedtest`; tidak ada angka simulasi. Metrik yang gagal diukur ditampilkan "—" beserta alasannya.
-- **Latency = HTTP latency** ke edge Cloudflare, bukan ICMP ping.
-- **Packet loss tidak ditampilkan** karena butuh server TURN yang tidak dikonfigurasi.
-- **Bufferbloat** hanya estimasi: selisih HTTP latency saat terbebani vs idle, dikelompokkan A+–F.
-- Latency terbebani hanya tersedia bila transfer cukup lama untuk membebani koneksi.
-- Jarum speedometer bergerak setiap satu pengukuran selesai (bukan aliran kontinu), karena library melaporkan hasil per permintaan.
-- Library mengirim ringkasan hasil ke Cloudflare (`speed.cloudflare.com/__results`) untuk insight agregat. Hal ini dijelaskan di situs. Situs ini sendiri tidak punya backend, akun, cookie, atau analitik.
-- Profil **Hemat data** memakai maks. ± 48 MB dan kurang akurat untuk koneksi di atas ± 100 Mbps. Profil **Standar** memakai pengaturan bawaan Cloudflare.
-- Avatar di halaman Tentang dimuat dari `github.com/r1dzzz.png`; jika gagal, tampil placeholder logo RLC.
-
-## Lisensi & merek dagang pihak ketiga
-
-- `@cloudflare/speedtest` — MIT.
-- Font Instrument Sans dan JetBrains Mono (via `@fontsource-variable`) — SIL OFL 1.1.
-- Logo Claude, ChatGPT/OpenAI, Grok, Kimi (SVG dari paket `@lobehub/icons-static-svg`, MIT) serta ikon GitHub adalah merek dagang pemiliknya, dipakai hanya untuk menyebut alat yang digunakan, tanpa afiliasi.
-- Lisensi kode proyek ini belum ditentukan; tambahkan file `LICENSE` sesuai pilihan Anda.
+<div align="center"><sub>Dibuat dengan ⚡ oleh RLC</sub></div>

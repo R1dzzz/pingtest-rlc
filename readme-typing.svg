@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="44" viewBox="0 0 720 44" role="img" aria-label="Real measurements. Real diagnostics. Real fast.">
+  <style>
+    text{font:600 20px Consolas,Menlo,monospace;fill:#c6f432}
+    .t{clip-path:inset(0 100% 0 0)}
+    .a{animation:type 3s steps(30) infinite alternate}
+    .b{animation-delay:.0s}
+    @keyframes type{0%{clip-path:inset(0 100% 0 0)}60%,100%{clip-path:inset(0 0 0 0)}}
+    @keyframes blink{50%{opacity:0}}
+    rect{fill:#c6f432;animation:blink 1s steps(1) infinite}
+  </style>
+  <text x="4" y="29" class="t a">$ ping --real --no-simulation _</text>
+</svg>

@@ -174,6 +174,7 @@ export function rowToSettings(row) {
     theme: ['dark', 'light', 'system'].includes(p.themeMode) ? p.themeMode : row.theme,
     glass: row.glass, motion: row.motion, sound: row.sound,
     haptics: p.haptics, keepAwake: p.keepAwake, fullscreen: p.fullscreen, exitConfirm: p.exitConfirm,
+    welcomeSeen: p.welcomeSeen === true ? true : undefined,
   };
 }
 
@@ -185,7 +186,7 @@ export async function saveSettings(s, lang) {
   };
   if (lang) base.lang = lang;
   if (prefsColumn) {
-    const prefs = { themeMode: s.theme, haptics: s.haptics, keepAwake: s.keepAwake, fullscreen: s.fullscreen, exitConfirm: s.exitConfirm };
+    const prefs = { themeMode: s.theme, haptics: s.haptics, keepAwake: s.keepAwake, fullscreen: s.fullscreen, exitConfirm: s.exitConfirm, welcomeSeen: !!s.welcomeSeen };
     const r = await sb.from('user_settings').upsert({ ...base, prefs }, { onConflict: 'user_id' });
     if (!r.error) return;
     if (!isPrefsError(r.error)) throw r.error;

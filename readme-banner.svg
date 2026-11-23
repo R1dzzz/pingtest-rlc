@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-label="PingTest by RLC">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#07080a"/><stop offset="1" stop-color="#12160a"/></linearGradient>
+    <radialGradient id="gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#c6f432" stop-opacity=".35"/><stop offset="1" stop-color="#c6f432" stop-opacity="0"/></radialGradient>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#c6f432" stroke-opacity=".08"/></pattern>
+  </defs>
+  <rect width="1200" height="320" fill="url(#bg)"/>
+  <rect width="1200" height="320" fill="url(#g)"><animateTransform attributeName="transform" type="translate" from="0 0" to="0 40" dur="4s" repeatCount="indefinite"/></rect>
+  <circle cx="190" cy="160" r="170" fill="url(#gl)"><animate attributeName="r" values="150;185;150" dur="5s" repeatCount="indefinite"/></circle>
+  <g transform="translate(120 100)">
+    <rect width="140" height="120" rx="26" fill="#c6f432" fill-opacity=".06" stroke="#c6f432" stroke-opacity=".6"/>
+    <path d="M45 30 L95 30 L78 62 L92 62 L58 98 L66 68 L50 68 Z" fill="#eef0f2"/>
+  </g>
+  <text x="310" y="150" font-family="Segoe UI,Helvetica,Arial,sans-serif" font-size="68" font-weight="700" fill="#eef0f2">PingTest <tspan fill="#c6f432">by RLC</tspan></text>
+  <text x="312" y="196" font-family="Consolas,Menlo,monospace" font-size="22" fill="#9097a0" letter-spacing="3">INTERNET SPEED &amp; QUALITY TEST</text>
+  <g font-family="Consolas,Menlo,monospace" font-size="15" fill="#c6f432">
+    <text x="312" y="248">▸ DOWNLOAD</text><text x="452" y="248">▸ UPLOAD</text><text x="562" y="248">▸ LATENCY</text><text x="684" y="248">▸ JITTER</text><text x="790" y="248">▸ BUFFERBLOAT</text>
+  </g>
+  <line x1="0" y1="2" x2="1200" y2="2" stroke="#c6f432" stroke-width="2"><animate attributeName="y1" values="0;320;0" dur="6s" repeatCount="indefinite"/><animate attributeName="y2" values="0;320;0" dur="6s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values=".6;.1;.6" dur="6s" repeatCount="indefinite"/></line>
+</svg>

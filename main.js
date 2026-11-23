@@ -19,12 +19,14 @@ import {
   initShell, isMember, getUser, requireMember, onAuthChange, setBusyCheck, toast, openAuth,
   openDialog, closeDialog, wireDialog, refreshLocks,
 } from './shell.js';
+import { initWelcome } from './welcome.js';
 import { listResults, insertResult, insertMany, deleteResult, deleteAllResults } from './cloud.js';
 import { haptic, setTestRunning } from './device.js';
 import { useCases, tips, compare } from './insight.js';
 import { renderShareImage, renderHistoryImage, historyStats, canWebShareFiles, canCopyImage } from './share.js';
 
 initShell();
+initWelcome();
 
 const els = {
   gauge: $('#gauge'), go: $('#btn-go'), cancel: $('#btn-cancel'), retry: $('#btn-retry'), share: $('#btn-share'),

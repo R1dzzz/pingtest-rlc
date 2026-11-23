@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { readFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,6 +10,15 @@ const root = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
 // ID build unik per build: dipakai service worker, version.json, dan pemeriksa pembaruan di aplikasi.
 const BUILD_ID = Date.now().toString(36);
+
+// Ukuran & SHA-256 APK dihitung saat build agar halaman Download tidak pernah memakai angka usang.
+let APK_SIZE = 0;
+let APK_SHA = '';
+try {
+  const buf = readFileSync(resolve(root, 'PingTest-by-RLC-Studio.apk'));
+  APK_SIZE = buf.length;
+  APK_SHA = createHash('sha256').update(buf).digest('hex');
+} catch { /* APK tidak ada: halaman menampilkan tanda strip */ }
 
 // Alamat situs untuk canonical, Open Graph, sitemap, dan robots.
 // Prioritas: variabel SITE_URL (opsional, atur di Vercel) → domain produksi Vercel → tebakan default.
@@ -32,14 +42,15 @@ function rlcSite() {
   const site = siteUrl();
   const rewrite = (req, _res, next) => {
     const path = (req.url || '').split('?')[0];
-    if (path === '/about') req.url = '/about.html' + (req.url.includes('?') ? '?' + req.url.split('?')[1] : '');
+    const map = { '/about': '/about.html', '/download': '/download.html' };
+    if (map[path]) req.url = map[path] + (req.url.includes('?') ? '?' + req.url.split('?')[1] : '');
     next();
   };
   return {
     name: 'rlc-site',
     transformIndexHtml: {
       order: 'pre',
-      handler: (html) => html.replaceAll('__SITE_URL__', site),
+      handler: (html) => html.replaceAll('__SITE_URL__', site).replaceAll('__APK_VERSION__', ANDROID_LATEST.versionName),
     },
     generateBundle() {
       for (const f of STATIC_FILES) {
@@ -66,7 +77,7 @@ function rlcSite() {
       });
       this.emitFile({
         type: 'asset', fileName: 'sitemap.xml',
-        source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${site}/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>\n  <url><loc>${site}/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>\n</urlset>\n`,
+        source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${site}/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>\n  <url><loc>${site}/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>\n  <url><loc>${site}/download</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>\n</urlset>\n`,
       });
     },
     configureServer(server) { server.middlewares.use(rewrite); },
@@ -76,14 +87,17 @@ function rlcSite() {
 
 export default defineConfig({
   publicDir: false,
-  define: { __APP_VERSION__: JSON.stringify(pkg.version), __BUILD_ID__: JSON.stringify(BUILD_ID) },
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version), __BUILD_ID__: JSON.stringify(BUILD_ID),
+    __APK_SHA256__: JSON.stringify(APK_SHA), __APK_SIZE__: JSON.stringify(APK_SIZE),
+  },
   plugins: [rlcSite()],
   build: {
     target: 'es2020',
     outDir: 'dist',
     assetsInlineLimit: 0,
     rollupOptions: {
-      input: { main: resolve(root, 'index.html'), about: resolve(root, 'about.html') },
+      input: { main: resolve(root, 'index.html'), about: resolve(root, 'about.html'), download: resolve(root, 'download.html') },
     },
   },
 });

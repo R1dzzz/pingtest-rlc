@@ -1,6 +1,6 @@
 // Kerangka bersama semua halaman: bahasa, Pusat Pengaturan, login/daftar, Guest vs Member,
 // aksi tertunda (dilanjutkan otomatis setelah login), pemasangan PWA, dan Service Worker.
-import { APK_URL, APK_BYTES, ITCH_URL } from './site.config.js';
+import { ITCH_URL } from './site.config.js';
 import { t, locale, initLang, setLang, getLang, onLangChange, applyDom, isManual } from './i18n.js';
 import { applySettings, resetToGuest, cacheSettings, getSettings, onSettingsChange, DEFAULTS } from './settings.js';
 import {
@@ -29,6 +29,7 @@ let authReason = false;
 export const isMember = () => member;
 export const getUser = () => user;
 export const setBusyCheck = (fn) => { busyCheck = fn; };
+export const isBusy = () => busyCheck();
 export function onAuthChange(fn) { authListeners.add(fn); return () => authListeners.delete(fn); }
 
 /* ---------- Toast ---------- */
@@ -270,6 +271,8 @@ function ensureAuthStarted() {
   return authStarted;
 }
 
+let pulling = null;
+
 async function applySession(session, event) {
   const nowMember = !!(session && session.user);
   const wasMember = member;
@@ -282,7 +285,9 @@ async function applySession(session, event) {
   if (nowMember) {
     user = { id: session.user.id, email: session.user.email || '' };
     member = true;
-    if (!sameUser) await pullSettings();
+    // Sesi bisa dilaporkan lebih dari sekali saat dipulihkan; semua pelapor menunggu penarikan pengaturan yang sama.
+    if (!sameUser) { pulling = pullSettings(); }
+    if (pulling) await pulling;
   } else {
     member = false;
     user = null;
@@ -326,6 +331,27 @@ async function pullSettings() {
   }
   setSoundEnabled(getSettings().sound);
   cacheSettings(user && user.id);
+}
+
+/* ---------- Landing pertama: status "sudah dilihat" ---------- */
+const WELCOME_LOCAL = 'pingtest-rlc:welcome:v1';
+const welcomeUserKey = (uid) => `pingtest-rlc:welcome:u:${uid}`;
+const lsGet = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch { /* abaikan */ } };
+/** Sudah dilihat di perangkat ini sebagai Guest? */
+export const welcomeSeenLocal = () => lsGet(WELCOME_LOCAL) === '1';
+/** Sudah dilihat oleh akun yang sedang login (cloud, lintas perangkat) atau tercatat lokal untuk akun ini? */
+export const welcomeSeenByAccount = () => !!(member && user && (getSettings().welcomeSeen || lsGet(welcomeUserKey(user.id)) === '1'));
+/** Catat bahwa landing sudah dilihat: lokal untuk perangkat, dan ke akun Supabase jika Member. */
+export function markWelcomeSeen() {
+  lsSet(WELCOME_LOCAL, '1');
+  if (member && user) {
+    lsSet(welcomeUserKey(user.id), '1');
+    const next = { ...getSettings(), welcomeSeen: true };
+    applySettings(next);
+    cacheSettings(user.id);
+    saveSettings(next, isManual() ? getLang() : null).catch(() => {});
+  }
 }
 
 export async function logout() {
@@ -396,24 +422,7 @@ function buildSettingsDialog() {
         <button type="button" class="btn ghost sm" id="set-acct-btn"></button>
       </section>
 
-      <section class="set-sec dl-section"${isAndroidApp() ? ' hidden' : ''}>
-        <h3 data-i18n="set.app"></h3>
-        <p class="fine" data-i18n="set.app.lede"></p>
-        <ul class="dl-list">
-          <li><a class="dl-item" href="${ITCH_URL}" target="_blank" rel="noopener noreferrer">
-            <span class="dl-ico"><img src="/brand-itchio.svg" alt="" width="28" height="28"></span>
-            <span class="dl-txt"><b data-i18n="set.itch"></b><small data-i18n="set.itch.sub"></small></span></a></li>
-          <li><div class="dl-item off" role="group" aria-disabled="true">
-            <span class="dl-ico dl-ico-text" aria-hidden="true">APK</span>
-            <span class="dl-txt"><b data-i18n="set.apkpure"></b><small data-i18n="set.apkpure.sub"></small></span>
-            <span class="dl-badge" data-i18n="set.soon"></span></div></li>
-          <li><a class="dl-item primary" href="${APK_URL}" download>
-            <span class="dl-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 20h16"/></svg></span>
-            <span class="dl-txt"><b data-i18n="set.apk"></b><small id="apk-meta"></small></span></a></li>
-        </ul>
-        <p class="fine" data-i18n="set.apk.note"></p>
-        <p class="fine" data-i18n="set.needsNet"></p>
-      </section>
+      <p class="fine" data-i18n="set.needsNet"></p>
     </div>`;
   document.body.append(d);
   applyDom(d);
@@ -503,7 +512,6 @@ function paintSettings() {
   $$('.switch', d).forEach((b) => b.setAttribute('aria-checked', String(!!s[b.dataset.key])));
   $('#set-acct', d).textContent = member && user ? t('set.signedAs', { email: user.email }) : t('set.guest');
   $('#set-acct-btn', d).textContent = member ? t('set.logout') : t('auth.cta');
-  $('#apk-meta', d).textContent = t('set.apk.meta', { size: (APK_BYTES / 1048576).toLocaleString(locale(), { maximumFractionDigits: 1 }) + ' MB' });
   const showFeat = { haptics: isAndroidApp() || !!navigator.vibrate, keepAwake: isAndroidApp() || 'wakeLock' in navigator, fullscreen: fullscreenSupported(), exitConfirm: true };
   $$('[data-feat]', d).forEach((r) => { r.hidden = !showFeat[r.dataset.feat]; });
   $('#exit-hint', d).textContent = t(isAndroidApp() ? 'set.exitHintApp' : 'set.exitHintWeb');

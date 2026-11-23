@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="72" viewBox="0 0 360 72" role="img" aria-label="RLC Repository of the Month (decorative, unofficial)">
+  <rect x="1" y="1" width="358" height="70" rx="10" fill="#0d0f11" stroke="#c6f432" stroke-opacity=".7"><animate attributeName="stroke-opacity" values=".35;.9;.35" dur="3s" repeatCount="indefinite"/></rect>
+  <path d="M36 14 l6 12 13 2 -10 9 3 13 -12 -7 -12 7 3 -13 -10 -9 13 -2z" fill="#c6f432" transform="translate(0 2) scale(.9)"/>
+  <text x="84" y="32" font-family="Consolas,Menlo,monospace" font-size="12" letter-spacing="2" fill="#9097a0">RLC</text>
+  <text x="84" y="54" font-family="Segoe UI,Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#eef0f2">Repository of the Month</text>
+</svg>

@@ -9,6 +9,7 @@ export const DEFAULTS = Object.freeze({
   keepAwake: true,     // layar tetap menyala selama tes berjalan
   fullscreen: false,   // sembunyikan bar sistem
   exitConfirm: true,   // konfirmasi sebelum keluar (Android) / sebelum menutup saat tes berjalan (web)
+  welcomeSeen: false,  // landing page pertama sudah dilihat (disimpan per akun, bukan pengaturan yang tampil)
 });
 export const THEMES = ['dark', 'light', 'system'];
 const CACHE = 'pingtest-rlc:settings:v1';
@@ -33,6 +34,7 @@ export function sanitize(s) {
     keepAwake: bool(o.keepAwake, DEFAULTS.keepAwake),
     fullscreen: bool(o.fullscreen, DEFAULTS.fullscreen),
     exitConfirm: bool(o.exitConfirm, DEFAULTS.exitConfirm),
+    welcomeSeen: o.welcomeSeen === true,
   };
 }
 
